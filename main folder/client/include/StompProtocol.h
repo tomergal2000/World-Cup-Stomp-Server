@@ -24,13 +24,15 @@ string UNSUBSCRIBE(vector<string>& input);
 string DISCONNECT();
 
 //serverToReaction is to use the following:
-string CONNECTED(vector<string>& input);
-string MESSAGE(vector<string>& input);
-string RECEIPT(vector<string>& input);
-string ERROR(vector<string>& input);
+void CONNECTED(vector<string>& input);
+void MESSAGE(vector<string>& input);
+void RECEIPT(vector<string>& input);
+void ERROR(vector<string>& input);
 
 public:
-ConnectionHandler handler;
+~StompProtocol();
+
+ConnectionHandler* handler;
 
 StompProtocol();
 string keyboardToFrame(string line);

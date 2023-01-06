@@ -18,8 +18,6 @@ public:
 
 	virtual ~ConnectionHandler();
 
-	void changeHostPort(string host, short port);
-
 	// Connect to the remote machine
 	bool connect();
 

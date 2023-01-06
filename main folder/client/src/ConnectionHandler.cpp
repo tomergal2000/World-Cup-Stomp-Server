@@ -15,11 +15,6 @@ ConnectionHandler::~ConnectionHandler() {
 	close();
 }
 
-void ConnectionHandler::changeHostPort(string host, short port){
-	host_ = host;
-	port_ = port;
-}
-
 bool ConnectionHandler::connect() {
 	std::cout << "Starting connect to "
 	          << host_ << ":" << port_ << std::endl;
