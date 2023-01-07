@@ -31,6 +31,11 @@ string StompProtocol::keyboardToFrame(string line)
     
     type = words[0];
 
+    if(username == "" && type != "login"){
+        cout << "The client is not yet logged in" << endl;
+        return "";
+    }
+
     if (type == "login")
         frame = CONNECT(words);
 

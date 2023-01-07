@@ -38,8 +38,8 @@ public class User {
             subIdToChanName.put(subId, subName);
     }
 
-    public void unsubscribe(String subscription) {
-        subIdToChanName.remove(subscription);
+    public void unsubscribe(Integer subId) {
+        subIdToChanName.remove(subId);
     }
     public String getUsername(){
         return username;
@@ -49,6 +49,13 @@ public class User {
     }
     public Integer getConId(){
         return connectionId;
+    }
+    public ConcurrentHashMap<Integer, String> getSubIdToChanName(){
+        return subIdToChanName;
+    }
+
+    public void unsubscribeAll() {
+        subIdToChanName.clear();
     }
 
 }

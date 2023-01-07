@@ -12,6 +12,7 @@ public interface Server<T> extends Closeable {
      */
     void serve();
 
+
     /**
      *This function returns a new instance of a thread per client pattern server
      * @param port The port for the server socket

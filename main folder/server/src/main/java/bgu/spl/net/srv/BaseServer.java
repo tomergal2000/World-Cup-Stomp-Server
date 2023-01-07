@@ -13,7 +13,7 @@ public abstract class BaseServer<T> implements Server<T> {
     private final Supplier<MessagingProtocol<T>> protocolFactory;
     private final Supplier<MessageEncoderDecoder<T>> encdecFactory;
     private ServerSocket sock;
-    private ConnectionsImpl<String> connections;
+    private ConnectionsImpl<T> connections;
 
     public BaseServer(
             int port,
@@ -24,7 +24,7 @@ public abstract class BaseServer<T> implements Server<T> {
         this.protocolFactory = protocolFactory;
         this.encdecFactory = encdecFactory;
 		this.sock = null;
-        this.connections = new ConnectionsImpl<String>();
+        this.connections = new ConnectionsImpl<>();
 
     }
 
@@ -67,6 +67,10 @@ public abstract class BaseServer<T> implements Server<T> {
     public void close() throws IOException {
 		if (sock != null)
 			sock.close();
+    }
+
+    public ConnectionsImpl<T> getConnections(){
+        return connections;
     }
 
     protected abstract void execute(BlockingConnectionHandler<T>  handler);
