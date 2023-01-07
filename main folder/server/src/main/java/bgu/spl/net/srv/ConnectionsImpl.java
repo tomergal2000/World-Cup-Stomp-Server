@@ -7,7 +7,7 @@ public class ConnectionsImpl<T> implements Connections<T> {
 
     private ConcurrentHashMap<Integer, ConnectionHandler<T>> ConIdToHandler;
     private ConcurrentHashMap<String, ArrayList<User>> ChanNameToUserList;
-    public ConcurrentHashMap<Integer, User> ConIdToUser;
+    public  ConcurrentHashMap<Integer, User> ConIdToUser;
     private ArrayList<User> users;
     private int connectionCounter;
     private int messageIdCounter;
