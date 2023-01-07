@@ -37,6 +37,7 @@ ConnectionHandler* handler;
 StompProtocol();
 string keyboardToFrame(string line);
 string serverToReaction(string frame);
+ConnectionHandler* getHandler();
 
 
 };

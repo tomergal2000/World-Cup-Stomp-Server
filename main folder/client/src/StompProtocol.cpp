@@ -91,6 +91,11 @@ string StompProtocol::serverToReaction(string frame){
     return frame;
 }
 
+ConnectionHandler* StompProtocol::getHandler()
+{
+    return handler;
+}
+
 // output functions:
 
 string StompProtocol::CONNECT(vector<string> &input)
@@ -165,8 +170,10 @@ void StompProtocol::MESSAGE(vector<string>& words)
 void StompProtocol::RECEIPT(vector<string>& words)
 {
     int receipt = stoi(words[1].substr(11));
-    if (receipt == -1)
+    if (receipt == -1){
         cout << "TODO: actually disconnect" << endl;
+        delete handler;//is this good?
+    }
     else{
         //make sure receipt is relevant
     }
