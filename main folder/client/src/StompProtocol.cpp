@@ -6,7 +6,7 @@
 
 using namespace std;
 
-StompProtocol::StompProtocol() : username(""), subscriptionCounter(0), handler(nullptr), topicToSubId() {}
+StompProtocol::StompProtocol() : username(""), subscriptionCounter(0), handler(nullptr), topicToSubId(), commandsLeft(0), shouldTerminate(false) {}
 
 StompProtocol::~StompProtocol(){
     if(handler != nullptr){
@@ -18,8 +18,9 @@ StompProtocol::~StompProtocol(){
 string StompProtocol::keyboardToFrame(string line)
 {
     string type;
-    string frame;
+    string frame = "";
     vector<string> words;
+    bool shouldDisconnect = false;
 
     stringstream ss(line);
     string word;
@@ -36,25 +37,40 @@ string StompProtocol::keyboardToFrame(string line)
         return "";
     }
 
-    if (type == "login")
+    if (type == "login"){
         frame = CONNECT(words);
+        commandsLeft++;
+    }
 
-    else if (type == "join")
-        frame = SUBSCRIBE(words);
+    else if(handler != nullptr){
+        if (type == "join"){
+            frame = SUBSCRIBE(words);
+            commandsLeft++;
+        }
+        else if (type == "exit"){
+            frame = UNSUBSCRIBE(words);
+            commandsLeft++;
+        }
+        else if (type == "report") // TODO implement
+            frame = SEND(words);
+        else if (type == "logout"){
+            frame = DISCONNECT();
+            commandsLeft++;
+        }
 
-    else if (type == "exit")
-        frame = UNSUBSCRIBE(words);
+        else
+            cout << "bad command" << endl;
+    }
 
-    else if (type == "report") // TODO implement
-        frame = SEND(words);
+    else cout << "Client not yet connected" << endl;
 
-    else if (type == "logout")
-        frame = DISCONNECT();
-    else
-        std::cout << "bad command" << endl;
-    // TODO: support summarry
+    // TODO: support summarry + print error
+    if(handler != nullptr && frame != "")
+        handler->sendMessage(frame);
 
-    return frame;
+    if(shouldDisconnect)
+        shouldTerminate = true;
+
 }
 
 string StompProtocol::serverToReaction(string frame){
@@ -71,17 +87,22 @@ string StompProtocol::serverToReaction(string frame){
     //for debugging:
     for(string w : words) cout << w << endl;
 
-    if (type == "CONNECTED")
+    if (type == "CONNECTED"){
         cout<<"login successful"<<endl;
-
+        commandsLeft--;
+    }
     else if (type == "MESSAGE")
         MESSAGE(words);
 
-    else if (type == "RECEIPT")
+    else if (type == "RECEIPT"){
         RECEIPT(words);
+        commandsLeft--;
+    }
 
-    else if (type == "ERROR")
+    else if (type == "ERROR"){
+        commandsLeft = 0;
         ERROR(words);
+    }
 
     else
         std::cout << "bad frame from server" << endl;
@@ -119,7 +140,6 @@ string StompProtocol::CONNECT(vector<string> &input)
     int port = stoi(input[2]);
     handler = new ConnectionHandler(host, port);
     handler->connect();
-
     return frame;
 }
 
@@ -171,8 +191,11 @@ void StompProtocol::RECEIPT(vector<string>& words)
 {
     int receipt = stoi(words[1].substr(11));
     if (receipt == -1){
-        cout << "TODO: actually disconnect" << endl;
-        delete handler;//is this good?
+        delete handler;
+        while(commandsLeft != 0){
+            cout << "busy-waiting" << endl;
+        }
+        shouldTerminate = true;
     }
     else{
         //make sure receipt is relevant
@@ -184,6 +207,6 @@ void StompProtocol::ERROR(vector<string>& words)
     for(int i = 3; i < words.size(); i++){
         cout << words[i] << endl;
     }
-
-    cout << "TODO: actually disconnect" << endl;
+    delete handler;
+    shouldTerminate = true;
 }

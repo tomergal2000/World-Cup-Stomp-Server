@@ -13,6 +13,7 @@ class StompProtocol
 private: 
 string username;
 int subscriptionCounter;
+int commandsLeft;
 unordered_map<string, int> topicToSubId;
 
 
@@ -30,6 +31,7 @@ void RECEIPT(vector<string>& input);
 void ERROR(vector<string>& input);
 
 public:
+bool shouldTerminate;
 ~StompProtocol();
 
 ConnectionHandler* handler;
