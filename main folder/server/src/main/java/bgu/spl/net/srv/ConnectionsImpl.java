@@ -58,10 +58,9 @@ public class ConnectionsImpl<T> implements Connections<T> {
 
     // assumes that client is not already logged in
     public int connect(String username, String password) {
-        // 0 - success - new user --> does it matter?
+        // 0 - success
         // 1 - wrong password
         // 2 - user already logged in
-        // 3 - success - existing user
         User toCheck = userExists(username);
 
         if (toCheck == null) {// means this user is new
@@ -77,7 +76,7 @@ public class ConnectionsImpl<T> implements Connections<T> {
         ConIdToUser.put(connectionCounter, toCheck);
         toCheck.connect(connectionCounter);
         // send CONNECTED frame
-        return 3;
+        return 0;
     }
 
     public boolean subscribe(String channel, Integer conId) {

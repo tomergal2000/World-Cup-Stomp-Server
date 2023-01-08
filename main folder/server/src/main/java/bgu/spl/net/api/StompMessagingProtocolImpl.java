@@ -104,7 +104,6 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
                 connections.disconnect(connectionId);
                 shouldTerminate = true;
                 break;
-                //add ERROR
         }
         return (T) message; //just to satisfy the interface
     }
@@ -131,7 +130,7 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
 
         connections.send(connectionId, frame);
         connections.disconnect(connectionId);
-
+        shouldTerminate = true;
     }
 
     public boolean shouldTerminate() {

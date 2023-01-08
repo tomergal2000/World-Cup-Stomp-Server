@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.function.Supplier;
+import java.util.logging.Handler;
 
 public abstract class BaseServer<T> implements Server<T> {
 
@@ -51,6 +52,7 @@ public abstract class BaseServer<T> implements Server<T> {
                         encdecFactory.get(),
                         protocolFactory.get());
 
+
                 connections.addHandler(handler);
                 
                 execute(handler);
@@ -75,4 +77,7 @@ public abstract class BaseServer<T> implements Server<T> {
 
     protected abstract void execute(BlockingConnectionHandler<T>  handler);
         //this will determine TPC (here we are supposed to create a new thread and run it)
+        //TODO: running while protocol !shouldTerminate()
+
+        
 }

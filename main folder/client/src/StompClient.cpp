@@ -7,7 +7,7 @@ int main(int argc, char *argv[]) {
 	ConnectionHandler* handler = protocol->getHandler();//check
 
 	thread KEYBOARDTOSERVER([](StompProtocol* protocol){
-		while(!protocol->shouldTerminate) {
+		while(!protocol->shouldTerminate) {//maybe while(1)
 			const short bufsize = 1024;
 			char buf[bufsize];
 			cin.getline(buf, bufsize);
@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
 
 	//This is the main thread. It reads from the server and reacts.
 
-	while(!protocol->shouldTerminate){
+	while(!protocol->shouldTerminate){//maybe while(1)
 		string ans;
 		if(!handler->getMessage(ans)){
 			cout << "Disconnected. Exiting...\n" << std::endl;

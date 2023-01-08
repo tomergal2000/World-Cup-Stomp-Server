@@ -1,16 +1,17 @@
 #pragma once
 
 #include "../include/ConnectionHandler.h"
+#include "../include/event.h"
 #include <string>
 #include <vector>
 #include <unordered_map>
 using namespace std;
 
 
-// TODO: implement the STOMP protocol
 class StompProtocol
 {
-private: 
+private:
+unordered_map<string, unordered_map<string, vector<string>>> userMaps;
 string username;
 int subscriptionCounter;
 int commandsLeft;
