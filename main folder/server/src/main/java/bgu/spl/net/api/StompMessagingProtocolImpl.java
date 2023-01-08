@@ -6,7 +6,7 @@ import bgu.spl.net.srv.Connections;
 import bgu.spl.net.srv.ConnectionsImpl;
 import java.util.ArrayList;
 
-public class StompMessagingProtocolImpl implements StompMessagingProtocol {
+public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> {
 
     private int connectionId;
     private ConnectionsImpl<String> connections;
@@ -18,11 +18,14 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol {
         shouldTerminate = false;
     }
 
-    public void process(String message) {
+    public T process(T frame) {
+        
+        String message = (String) frame;
         ArrayList<String> words = new ArrayList<String>();
         String word = "";
         boolean isValue = false;
         // notice: if it is a SEND frame, changes need to be made
+
         for (int c = 0; c < message.length(); c++) {// haha c++ but it's java
             if (message.charAt(c) == ':')
                 isValue = true;
@@ -35,7 +38,6 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol {
                     isValue = false;
                 }
             }
-
         }
 
         String type = words.get(0);
@@ -45,19 +47,25 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol {
                 String username = words.get(3);
                 String password = words.get(4);
                 int returnVal = connections.connect(username, password);
-                //maybe ERROR
+                if(returnVal == 1 || returnVal == 2){
+                    ERROR(returnVal);
+                }
+                else{
                 String connected = "CONNECTED" + '\n' + "version:1.2" + '\n' + '\n' + '\u0000';
                 connections.send(connectionId, connected);
-
+                }
                 break;
 
             case "SEND":
                 String channel1 = words.get(1).substring(1);
 
-                // TODO: Implement
-                String msg = "MESSAGE" + '\n';
-                int subscriptionId = 0;
-                // go over my user's channels and
+                if(!connections.isSubscribed(connectionId, channel1)){
+                    ERROR(3);
+                }
+                else{
+                String msg = "MESSAGE\n";
+                int subscriptionId = -1;
+                // go over my user's channels and find the right subId
                 ConcurrentHashMap<Integer, String> userSubs = connections.ConIdToUser.get(connectionId)
                         .getSubIdToChanName();
                 for (Integer key : userSubs.keySet()) {
@@ -69,14 +77,17 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol {
                 msg += "destination:/" + channel1 + '\n' + '\n';
                 msg += words.get(2) + '\n' + '\u0000';
                 connections.send(channel1, msg);
+                }
                 break;
 
             case "SUBSCRIBE":
                 String channel2 = words.get(1).substring(1);
-                connections.subscribe(channel2, connectionId);
+                boolean didSomething = connections.subscribe(channel2, connectionId);
 
+                if(didSomething){
                 String receipt1 = "RECEIPT" + '\n' + "receipt-id:" + words.get(3) + '\n' + '\n' + '\u0000';
                 connections.send(connectionId, receipt1);
+                }
                 break;
 
             case "UNSUBSCRIBE":
@@ -90,11 +101,37 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol {
                 break;
 
             case "DISCONNECT":
-                shouldTerminate = true;
                 connections.disconnect(connectionId);
+                shouldTerminate = true;
                 break;
-            //add ERROR
+                //add ERROR
         }
+        return (T) message; //just to satisfy the interface
+    }
+
+    private void ERROR(int type){
+        
+        String frame = "ERROR\n";
+        String errorMessage = "";
+        
+        if(type == 0){
+            errorMessage = "Socket Error\n";
+        }
+        if(type == 1){
+            errorMessage = "Wrong Password\n";
+        }
+        else if(type == 2){
+            errorMessage = "user already logged in\n";
+        }
+        else if(type == 3){
+            errorMessage = "User not subscribed to this channel\n";
+        } 
+
+        frame += errorMessage + "\n" + '\u0000';
+
+        connections.send(connectionId, frame);
+        connections.disconnect(connectionId);
+
     }
 
     public boolean shouldTerminate() {

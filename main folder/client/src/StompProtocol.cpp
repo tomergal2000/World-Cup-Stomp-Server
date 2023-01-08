@@ -88,7 +88,7 @@ string StompProtocol::serverToReaction(string frame){
     for(string w : words) cout << w << endl;
 
     if (type == "CONNECTED"){
-        cout<<"login successful"<<endl;
+        cout << "Login successful" << endl;
         commandsLeft--;
     }
     else if (type == "MESSAGE")
@@ -193,7 +193,7 @@ void StompProtocol::RECEIPT(vector<string>& words)
     if (receipt == -1){
         delete handler;
         while(commandsLeft != 0){
-            cout << "busy-waiting" << endl;
+            cout << "busy-waiting" << endl; //hopefully this never happens
         }
         shouldTerminate = true;
     }

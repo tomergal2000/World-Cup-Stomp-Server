@@ -2,15 +2,13 @@ package bgu.spl.net.api;
 
 import bgu.spl.net.srv.Connections;
 
-public interface StompMessagingProtocol  {
-	/**
+public interface StompMessagingProtocol<T> extends MessagingProtocol<T>  {
+	
+    /**
 	 * Used to initiate the current client protocol with it's personal connection ID and the connections implementation
 	**/
-    // amit changed the signature
     void start(int connectionId, Connections<String> connections);
-    
-    void process(String message);
-	
+    	
 	/**
      * @return true if the connection should be terminated
      */

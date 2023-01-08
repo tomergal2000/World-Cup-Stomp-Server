@@ -39,7 +39,7 @@ public class ConnectionsImpl<T> implements Connections<T> {
         // we need to diconnect him and send error frame
 
         ArrayList<User> subscribedUsers = ChanNameToUserList.get(channel);
-
+        
         for (User user : subscribedUsers) {
             ConnectionHandler<T> handler = ConIdToHandler.get(user.getConId());
             handler.send(msg);
@@ -58,7 +58,7 @@ public class ConnectionsImpl<T> implements Connections<T> {
 
     // assumes that client is not already logged in
     public int connect(String username, String password) {
-        // 0 - success - new user
+        // 0 - success - new user --> does it matter?
         // 1 - wrong password
         // 2 - user already logged in
         // 3 - success - existing user
@@ -80,15 +80,23 @@ public class ConnectionsImpl<T> implements Connections<T> {
         return 3;
     }
 
-    public void subscribe(String channel, Integer conId) {
+    public boolean subscribe(String channel, Integer conId) {
         ArrayList<User> subscribedUsers = ChanNameToUserList.get(channel);
         User user = ConIdToUser.get(conId);
         if (subscribedUsers == null) {
-            ArrayList<User> toAdd = new ArrayList<User>();
-            toAdd.add(user);
-            ChanNameToUserList.put(channel, toAdd);
-        } else if (!subscribedUsers.contains(user))
-            subscribedUsers.add(user);
+            ArrayList<User> chanToAdd = new ArrayList<User>();
+            chanToAdd.add(user);
+            ChanNameToUserList.put(channel, chanToAdd);
+            return true;
+        } else{
+            if (!subscribedUsers.contains(user)){
+                subscribedUsers.add(user);
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
     }
 
     public void unsubscribe(String channel, Integer conId) {
@@ -111,6 +119,12 @@ public class ConnectionsImpl<T> implements Connections<T> {
         User toAdd = new User(username, password, connectionCounter);
         users.add(toAdd);
         ConIdToUser.put(connectionCounter, toAdd);
+    }
+
+    public boolean isSubscribed(int ConId, String channel){
+        ArrayList<User> subscribedUsers = ChanNameToUserList.get(channel);
+        User user = ConIdToUser.get(ConId);
+        return subscribedUsers.contains(user);
     }
 
     public int getMessageId() {
