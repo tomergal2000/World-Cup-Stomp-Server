@@ -17,7 +17,7 @@ public class ConnectionsImpl<T> implements Connections<T> {
         ChanNameToUserList = new ConcurrentHashMap<String, ArrayList<User>>();
         ConIdToUser = new ConcurrentHashMap<Integer, User>();
         users = new ArrayList<User>();
-        messageIdCounter.set(0);
+        messageIdCounter = new AtomicInteger(0);
     }
 
     public boolean send(int connectionId, T msg) {
