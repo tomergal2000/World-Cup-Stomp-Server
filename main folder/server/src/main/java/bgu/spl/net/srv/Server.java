@@ -22,11 +22,12 @@ public interface Server<T> extends Closeable {
      * @return A new Thread per client server
      */
     public static <T> Server<T>  threadPerClient(
+            boolean isStomp,
             int port,
             Supplier<MessagingProtocol<T>> protocolFactory,
             Supplier<MessageEncoderDecoder<T> > encoderDecoderFactory) {
 
-        return new BaseServer<T>(port, protocolFactory, encoderDecoderFactory) {
+        return new BaseServer<T>(isStomp, port, protocolFactory, encoderDecoderFactory) {
             @Override
             protected void execute(BlockingConnectionHandler<T>  handler) {
                 new Thread(handler).start();
@@ -45,11 +46,12 @@ public interface Server<T> extends Closeable {
      * @return A new reactor server
      */
     public static <T> Server<T> reactor(
+            boolean isStomp,
             int nthreads,
             int port,
             Supplier<MessagingProtocol<T>> protocolFactory,
             Supplier<MessageEncoderDecoder<T>> encoderDecoderFactory) {
-        return new Reactor<T>(nthreads, port, protocolFactory, encoderDecoderFactory);
+        return new Reactor<T>(isStomp, nthreads, port, protocolFactory, encoderDecoderFactory);
     }
 
 }

@@ -2,6 +2,8 @@ package bgu.spl.net.srv;
 
 import bgu.spl.net.api.MessageEncoderDecoder;
 import bgu.spl.net.api.MessagingProtocol;
+import bgu.spl.net.impl.stomp.StompMessagingProtocolImpl;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -15,8 +17,10 @@ public abstract class BaseServer<T> implements Server<T> {
     private final Supplier<MessageEncoderDecoder<T>> encdecFactory;
     private ServerSocket sock;
     private ConnectionsImpl<T> connections;
+    private boolean isStomp;
 
     public BaseServer(
+            boolean isStomp,
             int port,
             Supplier<MessagingProtocol<T>> protocolFactory,
             Supplier<MessageEncoderDecoder<T>> encdecFactory) {
@@ -26,8 +30,10 @@ public abstract class BaseServer<T> implements Server<T> {
         this.encdecFactory = encdecFactory;
 		this.sock = null;
         this.connections = new ConnectionsImpl<>();
+        this.isStomp = isStomp;
 
     }
+
 
     @Override
     public void serve() {
@@ -41,16 +47,26 @@ public abstract class BaseServer<T> implements Server<T> {
 
                 Socket clientSock = serverSock.accept();
                 
-                synchronized(this){
+                synchronized(this){//do we need this?
                     
                 //try and catch ioEcxeption. when catching - return ERROR frame.
                 //check that clienSock.getInetAddress() is unique. if not - return ERROR frame.
                 //also make sure username is not already connected. happens in connect().
+                BlockingConnectionHandler<T> handler;
+                if(isStomp){
+                    handler = new BlockingConnectionHandler<T>(
+                        clientSock,
+                        encdecFactory.get(),
+                        (StompMessagingProtocolImpl<T>)protocolFactory.get(),
+                        connections);
+                }
 
-                BlockingConnectionHandler<T> handler = new BlockingConnectionHandler<T>(
+                else{
+                    handler = new BlockingConnectionHandler<T>(
                         clientSock,
                         encdecFactory.get(),
                         protocolFactory.get());
+                }
 
 
                 connections.addHandler(handler);

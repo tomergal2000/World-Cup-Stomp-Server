@@ -1,7 +1,8 @@
 package bgu.spl.net.srv;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.ArrayList;
+import java.util.ArrayList;//TODO: maybe blocking list bc user can try to connect concurrently from 2 computers (clients)
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ConnectionsImpl<T> implements Connections<T> {
 
@@ -9,17 +10,14 @@ public class ConnectionsImpl<T> implements Connections<T> {
     private ConcurrentHashMap<String, ArrayList<User>> ChanNameToUserList;
     public  ConcurrentHashMap<Integer, User> ConIdToUser;
     private ArrayList<User> users;
-    private int connectionCounter;
-    private int messageIdCounter;
+    private AtomicInteger messageIdCounter;
 
     public ConnectionsImpl() {
         ConIdToHandler = new ConcurrentHashMap<Integer, ConnectionHandler<T>>();
         ChanNameToUserList = new ConcurrentHashMap<String, ArrayList<User>>();
         ConIdToUser = new ConcurrentHashMap<Integer, User>();
         users = new ArrayList<User>();
-        connectionCounter = 0;
-        messageIdCounter = 0;
-
+        messageIdCounter.set(0);
     }
 
     public boolean send(int connectionId, T msg) {
@@ -48,24 +46,23 @@ public class ConnectionsImpl<T> implements Connections<T> {
 
     public void disconnect(int connectionId) {
         ConIdToUser.get(connectionId).unsubscribeAll();
-        ConIdToHandler.remove(connectionId);//maybe somehow kill the handler?
+        ConIdToHandler.remove(connectionId);
         ConIdToUser.remove(connectionId);
     }
 
     public void addHandler(ConnectionHandler handler) {
-        ConIdToHandler.put(connectionCounter++, handler);
+        ConIdToHandler.put(handler.getId() , handler);
     }
 
-    // assumes that client is not already logged in
-    public int connect(String username, String password) {
+    // assumes that client is not yet logged in
+    public int connect(int connectionId, String username, String password) {
         // 0 - success
         // 1 - wrong password
         // 2 - user already logged in
         User toCheck = userExists(username);
 
         if (toCheck == null) {// means this user is new
-            createNewUser(username, password);
-            // send CONNECTED frame
+            createNewUser(username, password, connectionId);
             return 0;
         } else if (toCheck.getPassword() != password)
             return 1;
@@ -73,9 +70,8 @@ public class ConnectionsImpl<T> implements Connections<T> {
         else if (ConIdToUser.contains(toCheck))
             return 2;
 
-        ConIdToUser.put(connectionCounter, toCheck);
-        toCheck.connect(connectionCounter);
-        // send CONNECTED frame
+        ConIdToUser.put(connectionId, toCheck);
+        toCheck.connect(connectionId);
         return 0;
     }
 
@@ -114,10 +110,10 @@ public class ConnectionsImpl<T> implements Connections<T> {
         return null;
     }
 
-    private void createNewUser(String username, String password) {
-        User toAdd = new User(username, password, connectionCounter);
+    private void createNewUser(String username, String password, int connectionId) {
+        User toAdd = new User(username, password, connectionId);
         users.add(toAdd);
-        ConIdToUser.put(connectionCounter, toAdd);
+        ConIdToUser.put(connectionId, toAdd);
     }
 
     public boolean isSubscribed(int ConId, String channel){
@@ -127,7 +123,7 @@ public class ConnectionsImpl<T> implements Connections<T> {
     }
 
     public int getMessageId() {
-        return ++messageIdCounter;
+        return messageIdCounter.getAndIncrement();
     }
 
 }

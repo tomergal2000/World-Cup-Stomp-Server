@@ -2,6 +2,7 @@ package bgu.spl.net.srv;
 
 import bgu.spl.net.api.MessageEncoderDecoder;
 import bgu.spl.net.api.MessagingProtocol;
+import bgu.spl.net.impl.stomp.StompMessagingProtocolImpl;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -9,18 +10,30 @@ import java.net.Socket;
 
 public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler<T> {
 
+    private Integer PortId = null;
     private final MessagingProtocol<T> protocol;
     private final MessageEncoderDecoder<T> encdec;
     private final Socket sock;
     private BufferedInputStream in;
     private BufferedOutputStream out;
     private volatile boolean connected = true;
-    private Integer connectionId;
+    private Integer connectionId = null;
+    private ConnectionsImpl<T> connections = null;
     
     public BlockingConnectionHandler(Socket sock, MessageEncoderDecoder<T> reader, MessagingProtocol<T> MessagingProtocol) {
         this.sock = sock;
         this.encdec = reader;
         this.protocol = MessagingProtocol;
+    }
+
+    public BlockingConnectionHandler(Socket sock, MessageEncoderDecoder<T> reader, StompMessagingProtocolImpl<T> MessagingProtocol, ConnectionsImpl<T> connections) {
+        this.sock = sock;
+        this.encdec = reader;
+        this.protocol = MessagingProtocol;
+        this.connections = connections;
+        PortId = sock.getPort();
+        connections.addHandler(this);
+        ((StompMessagingProtocolImpl<T>) protocol).start(PortId, connections);
     }
 
     @Override
@@ -63,5 +76,10 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
 
     public Integer getConnectionId() {
         return connectionId;
+    }
+
+    @Override
+    public Integer getId() {
+        return this.PortId;
     }
 }
