@@ -33,15 +33,26 @@ public class ConnectionsImpl<T> implements Connections<T> {
     }
 
     public void send(String channel, T msg) {
-        // TODO: when client wants to send message but he is not subs.:
-        // we need to diconnect him and send error frame
 
         ArrayList<User> subscribedUsers = ChanNameToUserList.get(channel);
         
         for (User user : subscribedUsers) {
+            msg = (T)insertSubId(msg, user.getSubId(channel).toString());
             ConnectionHandler<T> handler = ConIdToHandler.get(user.getConId());
             handler.send(msg);
         }
+    }
+
+    private String insertSubId(T msg, String subscrId) {
+        String toSend = (String) msg;
+        String edited = "";
+        edited += toSend.substring(0, 21) + subscrId + '\n';
+        edited += toSend.substring(21);
+        
+        //for debugging:
+        System.out.println(edited);
+        
+        return edited;
     }
 
     public void disconnect(int connectionId) {

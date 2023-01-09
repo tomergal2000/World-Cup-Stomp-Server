@@ -1,22 +1,22 @@
 package bgu.spl.net.srv;
 
 // import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
 
 
 public class User {
 
     private String username;
     private String password;
-    private ConcurrentHashMap<Integer, String> subIdToChanName;
-    private int subIdCounter;
+    private ArrayList<String> channelList;
+    // private int subIdCounter;
     private Integer connectionId;
 
     public User(String username, String password, Integer connectionId) {
         this.username = username;
         this.password = password;
-        this.subIdToChanName = new ConcurrentHashMap<Integer, String>();
-        this.subIdCounter = 0;
+        this.channelList = new ArrayList<String>();
+        // this.subIdCounter = 0;
         this.connectionId = connectionId;
     }
 
@@ -32,30 +32,36 @@ public class User {
         return connectionId != null;
     }
 
-    //TODO: handle ERROR
+    //TODO: handle ERROR?
     public void subscribe(Integer subId, String subName) {
-        if (!subIdToChanName.contains(subId))
-            subIdToChanName.put(subId, subName);
+        if (!channelList.contains(subName))
+            channelList.add(subId, subName);
     }
 
-    public void unsubscribe(Integer subId) {
-        subIdToChanName.remove(subId);
+    public void unsubscribe(String channel) {
+        channelList.remove(channel);
     }
+
     public String getUsername(){
         return username;
     }
+
     public String getPassword(){
         return password;
     }
+
     public Integer getConId(){
         return connectionId;
     }
-    public ConcurrentHashMap<Integer, String> getSubIdToChanName(){
-        return subIdToChanName;
+    
+    public ArrayList<String> getChannelList(){
+        return channelList;
     }
-
+    public Integer getSubId(String channelName){
+        return channelList.indexOf(channelName);
+    }
     public void unsubscribeAll() {
-        subIdToChanName.clear();
+        channelList.clear();
     }
 
 }

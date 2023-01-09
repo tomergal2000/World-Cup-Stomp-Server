@@ -32,25 +32,7 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
         ArrayList<String> words = new ArrayList<String>();
         String word = "";
         boolean isValue = false;
-        // notice: if it is a SEND frame, changes need to be made
-
-        // if (InputError1(frame)){
-            
-        // }
-
-        for (int c = 0; c < message.length(); c++) {// haha c++ but it's java
-            if (message.charAt(c) == ':')
-                isValue = true;
-            if (isValue) {
-                if (message.charAt(c) != '\n' && message.charAt(c) != '\u0000')
-                    word += message.charAt(c);
-                else {
-                    words.add(word);
-                    word = "";
-                    isValue = false;
-                }
-            }
-        }
+        stringToWords(words, message);
 
         String type = words.get(0);
 
@@ -76,15 +58,15 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
                 }
                 else{
                 String msg = "MESSAGE\n";
-                int subscriptionId = -1;
+                // int subscriptionId = -1;
                 // go over my user's channels and find the right subId
-                ConcurrentHashMap<Integer, String> userSubs = connections.ConIdToUser.get(connectionId)
-                        .getSubIdToChanName();
-                for (Integer key : userSubs.keySet()) {
-                    if (userSubs.get(key).equals(channel1))
-                        subscriptionId = key;
-                }
-                msg += "subscription:" + subscriptionId + '\n';
+                // ConcurrentHashMap<Integer, String> userSubs = connections.ConIdToUser.get(connectionId)
+                //         .getSubIdToChanName();
+                // for (Integer key : userSubs.keySet()) {
+                //     if (userSubs.get(key).equals(channel1))
+                //         subscriptionId = key;
+                // }
+                msg += "subscription:";
                 msg += "message-id:" + connections.getMessageId() + '\n';
                 msg += "destination:/" + channel1 + '\n' + '\n';
                 for(int i = 2; i < words.size(); i++){
@@ -106,15 +88,17 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
 
             case "UNSUBSCRIBE":
                 int subId = Integer.parseInt(words.get(1));
-                connections.ConIdToUser.get(connectionId).unsubscribe(subId);
-                String channel3 = connections.ConIdToUser.get(connectionId).getSubIdToChanName().get(subId);
-                connections.unsubscribe(channel3, connectionId);
+                String channelName = connections.ConIdToUser.get(connectionId).getChannelList().get(subId);
+                connections.ConIdToUser.get(connectionId).unsubscribe(channelName);
+                connections.unsubscribe(channelName, connectionId);
 
                 String receipt2 = "RECEIPT" + '\n' + "receipt-id:" + words.get(2) + '\n' + '\n' + '\u0000';
                 connections.send(connectionId, (T)receipt2);
                 break;
 
             case "DISCONNECT":
+                String receipt = "RECEIPT" + '\n' + "receipt-id:-1"  + '\n' + '\n' + '\u0000';
+                connections.send(connectionId, (T)receipt);
                 connections.disconnect(connectionId);
                 shouldTerminate = true;
                 break;
@@ -122,9 +106,28 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
             default:
                 ERROR(4);
 
-
         }
         return (T) message; //just to satisfy the interface
+    }
+
+    private void stringToWords(ArrayList<String> words, String inFrame){
+        String word = "";
+        boolean isValue = false;
+        int firstLineEnding = inFrame.indexOf('\n');
+        words.add(inFrame.substring(0, firstLineEnding));
+        for (int c = firstLineEnding; c < inFrame.length(); c++) {// haha c++ but it's java
+            if (inFrame.charAt(c) == ':')
+                isValue = true;
+            else if (isValue) {
+                if (inFrame.charAt(c) != '\n' && inFrame.charAt(c) != '\u0000')
+                    word += inFrame.charAt(c);
+                else {
+                    words.add(word);
+                    word = "";
+                    isValue = false;
+                }
+            }
+        }
     }
 
     // private boolean InputError1(T frame) {
