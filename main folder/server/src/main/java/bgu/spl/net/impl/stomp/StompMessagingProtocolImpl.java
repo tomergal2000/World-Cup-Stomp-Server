@@ -77,6 +77,7 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
                 break;
 
             case "SUBSCRIBE":
+
                 String channel2 = words.get(1).substring(1);
                 boolean didSomething = connections.subscribe(channel2, connectionId);
 
@@ -90,10 +91,15 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
                 int subId = Integer.parseInt(words.get(1));
                 String channelName = connections.ConIdToUser.get(connectionId).getChannelList().get(subId);
                 connections.ConIdToUser.get(connectionId).unsubscribe(channelName);
-                connections.unsubscribe(channelName, connectionId);
-
-                String receipt2 = "RECEIPT" + '\n' + "receipt-id:" + words.get(2) + '\n' + '\n' + '\u0000';
-                connections.send(connectionId, (T)receipt2);
+                boolean wasSubscribed= connections.unsubscribe(channelName, connectionId);
+                if(wasSubscribed){
+                    String receipt2 = "RECEIPT" + '\n' + "receipt-id:" + words.get(2) + '\n' + '\n' + '\u0000';
+                    connections.send(connectionId, (T)receipt2);
+                }
+                else{
+                    ERROR(3);
+                }
+                
                 break;
 
             case "DISCONNECT":

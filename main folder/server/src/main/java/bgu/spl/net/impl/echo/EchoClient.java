@@ -11,8 +11,13 @@ public class EchoClient {
 
     public static void main(String[] args) throws IOException {
 
+        String testSUB = "SUBSCRIBE\ndestination:/germany_spain\nid:17\nreceipt:73\n\n\u0000";
+        String testCON = "CONNECT\naccept-version:1.2\nhost:stomp.cs.bgu.ac.il\nlogin:meni\npasscode:films\n\n\u0000";
+        String testUNS = "UNSUBSCRIBE\nid:17\nreceipt:82\n\n\u0000";
+        String testDIS = "DISCONNECT\nreceipt:113\n\n\u0000";
+
         if (args.length == 0) {
-            args = new String[]{"localhost", "hello"};
+            args = new String[]{"localhost", testUNS};
         }
 
         if (args.length < 2) {

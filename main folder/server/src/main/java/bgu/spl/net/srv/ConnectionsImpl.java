@@ -105,12 +105,13 @@ public class ConnectionsImpl<T> implements Connections<T> {
         }
     }
 
-    public void unsubscribe(String channel, Integer conId) {
+    public boolean unsubscribe(String channel, Integer conId) {
         ArrayList<User> subscribedUsers = ChanNameToUserList.get(channel);
         if (subscribedUsers != null) {
             User user = ConIdToUser.get(conId);
-            subscribedUsers.remove(user);
+            return subscribedUsers.remove(user);
         }
+        return false;
     }
 
     private User userExists(String username) {
