@@ -67,9 +67,6 @@ public abstract class BaseServer<T> implements Server<T> {
                         encdecFactory.get(),
                         protocolFactory.get());
                 }
-
-
-                connections.addHandler(handler);
                 
                 execute(handler);
 

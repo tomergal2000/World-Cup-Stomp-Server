@@ -1,22 +1,20 @@
 package bgu.spl.net.srv;
 
 // import java.util.ArrayList;
-import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class User {
 
     private String username;
     private String password;
-    private ArrayList<String> channelList;
-    // private int subIdCounter;
+    private HashMap<Integer, String> subIdToChan;
     private Integer connectionId;
 
     public User(String username, String password, Integer connectionId) {
         this.username = username;
         this.password = password;
-        this.channelList = new ArrayList<String>();
-        // this.subIdCounter = 0;
+        this.subIdToChan = new HashMap<Integer, String>();
         this.connectionId = connectionId;
     }
 
@@ -33,13 +31,23 @@ public class User {
     }
 
     //TODO: handle ERROR?
-    public void subscribe(Integer subId, String subName) {
-        if (!channelList.contains(subName))
-            channelList.add(subId, subName);
+    public boolean subscribe(Integer subId, String subName) {
+        boolean keyISUsed = subIdToChan.containsKey(subId);
+        boolean nameIsUsed = subIdToChan.containsValue(subName);
+        
+        if(!keyISUsed && !nameIsUsed){
+            subIdToChan.put(subId, subName);
+            return true;
+        }
+        else if(keyISUsed && nameIsUsed && subIdToChan.get(subId) == subName)
+            return true;
+        
+        else return false;
+
     }
 
-    public void unsubscribe(String channel) {
-        channelList.remove(channel);
+    public boolean unsubscribe(Integer subId) {
+        return subIdToChan.remove(subId) != null;
     }
 
     public String getUsername(){
@@ -54,14 +62,21 @@ public class User {
         return connectionId;
     }
     
-    public ArrayList<String> getChannelList(){
-        return channelList;
-    }
     public Integer getSubId(String channelName){
-        return channelList.indexOf(channelName);
+        for(Integer key : subIdToChan.keySet()){
+            if(subIdToChan.get(key) == channelName)
+                return key;
+        }
+        return -1;
+    }
+    public String getSubName(Integer subId){
+        return subIdToChan.get(subId);
     }
     public void unsubscribeAll() {
-        channelList.clear();
+        subIdToChan.clear();
+    }
+
+    public void printSubs() {
     }
 
 }

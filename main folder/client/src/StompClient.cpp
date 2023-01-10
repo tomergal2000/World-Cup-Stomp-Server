@@ -3,31 +3,35 @@
 
 int main(int argc, char *argv[]) {
 	
-	StompProtocol* protocol = new StompProtocol();
-	ConnectionHandler* handler = protocol->getHandler();//check
+	while(1){
 
-	thread KEYBOARDTOSERVER([](StompProtocol* protocol){
-		while(!protocol->shouldTerminate) {//maybe while(1)
-			const short bufsize = 1024;
-			char buf[bufsize];
-			cin.getline(buf, bufsize);
-			string line(buf);
-			protocol->keyboardToFrame(line);//this also sends the frame
+		StompProtocol* protocol = new StompProtocol();
+		ConnectionHandler* handler = protocol->getHandler();
+
+		thread KEYBOARDTOSERVER([](StompProtocol* protocol){
+			while(!protocol->shouldTerminate) {//maybe while(1)
+				const short bufsize = 1024;
+				char buf[bufsize];
+				cin.getline(buf, bufsize);
+				string line(buf);
+				protocol->keyboardToFrame(line);//this also sends the frame
+			}
+		}, protocol);
+
+		//This is the main thread. It reads from the server and reacts.
+
+		while(!protocol->shouldTerminate){//maybe while(1)
+			string ans;
+			if(!handler->getMessage(ans)){
+				cout << "Disconnected. Exiting...\n" << std::endl;
+				break;
+			}
+			protocol->serverToReaction(ans);
 		}
-	}, protocol);
 
-	//This is the main thread. It reads from the server and reacts.
+		KEYBOARDTOSERVER.join();
 
-	while(!protocol->shouldTerminate){//maybe while(1)
-		string ans;
-		if(!handler->getMessage(ans)){
-			cout << "Disconnected. Exiting...\n" << std::endl;
-            break;
-		}
-		protocol->serverToReaction(ans);
+		return 0;
 	}
 
-	KEYBOARDTOSERVER.join();
-
-	return 0;
 }

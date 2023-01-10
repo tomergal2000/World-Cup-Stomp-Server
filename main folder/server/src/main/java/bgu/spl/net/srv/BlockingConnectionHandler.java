@@ -10,7 +10,7 @@ import java.net.Socket;
 
 public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler<T> {
 
-    private Integer PortId = null;
+    private Integer portId = null;
     private final MessagingProtocol<T> protocol;
     private final MessageEncoderDecoder<T> encdec;
     private final Socket sock;
@@ -18,7 +18,6 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
     private BufferedOutputStream out;
     private volatile boolean connected = true;
     private Integer connectionId = null;
-    private ConnectionsImpl<T> connections = null;
     
     public BlockingConnectionHandler(Socket sock, MessageEncoderDecoder<T> reader, MessagingProtocol<T> MessagingProtocol) {
         this.sock = sock;
@@ -30,10 +29,9 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
         this.sock = sock;
         this.encdec = reader;
         this.protocol = MessagingProtocol;
-        this.connections = connections;
-        PortId = sock.getPort();
-        connections.addHandler(this);
-        ((StompMessagingProtocolImpl<T>) protocol).start(PortId, connections);
+        portId = sock.getPort();
+        connections.addHandler(portId, this);
+        ((StompMessagingProtocolImpl<T>) protocol).start(portId, connections);
     }
 
     @Override
@@ -80,6 +78,6 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
 
     @Override
     public Integer getId() {
-        return this.PortId;
+        return this.portId;
     }
 }

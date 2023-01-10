@@ -105,7 +105,6 @@ public class Reactor<T> implements Server<T> {
         //also make sure username is not already connected.
         
         clientChan.configureBlocking(false);
-        //blablabla
         final NonBlockingConnectionHandler<T> handler;
         if(isStomp){
                 handler = new NonBlockingConnectionHandler<T>(
@@ -123,7 +122,6 @@ public class Reactor<T> implements Server<T> {
                 clientChan,
                 this);
         }
-        //bklablabla
         clientChan.register(selector, SelectionKey.OP_READ, handler);
     }
 

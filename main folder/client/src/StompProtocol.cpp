@@ -53,6 +53,7 @@ string StompProtocol::keyboardToFrame(string line)
         }
         else if (type == "report") // TODO implement
             frame = SEND(words);
+        
         else if (type == "logout"){
             frame = DISCONNECT();
             commandsLeft++;

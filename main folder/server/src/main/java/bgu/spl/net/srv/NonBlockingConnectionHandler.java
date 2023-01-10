@@ -23,8 +23,6 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
     private final SocketChannel chan;
     private final Reactor reactor;
     private Integer portId = null;
-    private ConnectionsImpl<T> connections;
-    private Integer PortId = null;
 
     public NonBlockingConnectionHandler(
             MessageEncoderDecoder<T> reader,
@@ -48,10 +46,9 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
         this.encdec = reader;
         this.protocol = protocol;
         this.reactor = reactor;
-        this.connections = connections;
-        this.PortId = chan.socket().getPort();
-        connections.addHandler(this);
-        ((StompMessagingProtocolImpl<T>)protocol).start(PortId, connections);
+        this.portId = chan.socket().getPort();
+        connections.addHandler(portId, this);
+        ((StompMessagingProtocolImpl<T>)protocol).start(portId, connections);
     }
 
     public Runnable continueRead() {
@@ -140,7 +137,7 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
 
     @Override
     public void send(T msg) {
-        writeQueue.add(ByteBuffer.wrap((byte[]) msg));
+        writeQueue.add(ByteBuffer.wrap(((String)msg).getBytes()));
         reactor.updateInterestedOps(chan, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
     }
 

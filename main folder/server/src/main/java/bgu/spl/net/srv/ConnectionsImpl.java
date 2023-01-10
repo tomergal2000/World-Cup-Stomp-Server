@@ -61,8 +61,8 @@ public class ConnectionsImpl<T> implements Connections<T> {
         ConIdToUser.remove(connectionId);
     }
 
-    public void addHandler(ConnectionHandler handler) {
-        ConIdToHandler.put(handler.getId() , handler);
+    public void addHandler(Integer conId, ConnectionHandler handler) {
+        ConIdToHandler.put(conId , handler);
     }
 
     // assumes that client is not yet logged in
@@ -86,30 +86,34 @@ public class ConnectionsImpl<T> implements Connections<T> {
         return 0;
     }
 
-    public boolean subscribe(String channel, Integer conId) {
+    public boolean subscribe(Integer subId, String channel, Integer conId) {
         ArrayList<User> subscribedUsers = ChanNameToUserList.get(channel);
         User user = ConIdToUser.get(conId);
         if (subscribedUsers == null) {
             ArrayList<User> chanToAdd = new ArrayList<User>();
             chanToAdd.add(user);
             ChanNameToUserList.put(channel, chanToAdd);
-            return true;
-        } else{
-            if (!subscribedUsers.contains(user)){
-                subscribedUsers.add(user);
-                return true;
-            }
-            else{
-                return false;
-            }
+            return user.subscribe(subId, channel);
+        } 
+        else if(!subscribedUsers.contains(user)){
+            subscribedUsers.add(user);
+            return user.subscribe(subId, channel);
+        }
+        else{//subscribedUserd already contains user
+            return user.subscribe(subId, channel);
         }
     }
 
-    public boolean unsubscribe(String channel, Integer conId) {
+    public boolean unsubscribe(Integer subId, String channel, Integer conId) {
         ArrayList<User> subscribedUsers = ChanNameToUserList.get(channel);
         if (subscribedUsers != null) {
             User user = ConIdToUser.get(conId);
-            return subscribedUsers.remove(user);
+            boolean wasSubscribed = user.unsubscribe(subId);
+            if (wasSubscribed){
+                subscribedUsers.remove(user);
+                return true;
+            }
+            return false;
         }
         return false;
     }
@@ -138,4 +142,11 @@ public class ConnectionsImpl<T> implements Connections<T> {
         return messageIdCounter.getAndIncrement();
     }
 
+    public User getUser(Integer conId){
+        try{
+            return ConIdToUser.get(conId);
+        }catch (NullPointerException e){
+            return null;
+        }
+    }
 }
