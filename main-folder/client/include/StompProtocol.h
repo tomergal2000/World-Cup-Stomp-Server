@@ -17,7 +17,7 @@ string username;
 int subscriptionCounter;
 int commandsLeft;
 map<string, int> topicToSubId;
-map <tuple<string, string> , list<Event&>> & tupleToEventList;
+map <pair<string, string> , list<Event&>> & pairToEventList;
 
 
 //keyboardToFrame is to use these methods:
@@ -28,13 +28,15 @@ string StompProtocol::createSendFrameOpening(names_and_events& names_and_events)
 void SUBSCRIBE(vector<string>& input);
 void UNSUBSCRIBE(vector<string>& input);
 void DISCONNECT();
+void SUMMARIZE(vector<string>& input);
+void sendFrame(string frame);
 
 //serverToReaction is to use the following:
 void CONNECTED(vector<string>& input);
 void MESSAGE(vector<string>& input);
 void RECEIPT(vector<string>& input);
 void ERROR(vector<string>& input);
-void sendFrame(string frame);
+
 
 public:
 bool shouldTerminate;
@@ -42,7 +44,7 @@ bool shouldTerminate;
 
 ConnectionHandler* handler;
 
-StompProtocol(map <tuple<string, string> , list<Event&>> & tupleToEventList);
+StompProtocol(map <pair<string, string> , list<Event&>> & pairToEventList);
 void keyboardToFrame(string line);
 string serverToReaction(string frame);
 ConnectionHandler* getHandler();

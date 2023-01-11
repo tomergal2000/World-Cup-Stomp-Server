@@ -8,7 +8,7 @@
 
 using namespace std;
 
-StompProtocol::StompProtocol(map <tuple<string, string>, list<Event&>> & tupleToEventList) : username(""), subscriptionCounter(0), handler(nullptr), topicToSubId(), commandsLeft(0), shouldTerminate(false),tupleToEventList(tupleToEventList) {}
+StompProtocol::StompProtocol(map <pair<string, string>, list<Event&>> & pairToEventList) : username(""), subscriptionCounter(0), handler(nullptr), topicToSubId(), commandsLeft(0), shouldTerminate(false),pairToEventList(pairToEventList) {}
 
 StompProtocol::~StompProtocol(){
     if(handler != nullptr){
@@ -58,6 +58,11 @@ void StompProtocol::keyboardToFrame(string line)//******************************
         else if (type == "logout"){
             DISCONNECT();
             commandsLeft++;
+        }
+        else if(type == "summarize"){
+            commandsLeft++;
+            SUMMARIZE(words);
+            commandsLeft--;
         }
     
 
@@ -200,6 +205,18 @@ void StompProtocol::DISCONNECT()
     frame += "receipt:" + to_string(-1) + '\n' + '\n' + '\0';
     sendFrame(frame);
 }
+void StompProtocol::SUMMARIZE(vector<string> &input){
+
+    # psodoCode
+    #   find file, if not exist make one
+    #   find relavent list in map
+    #   make string:
+    #       headline (name a vs name b)
+    #       team a stats: (lex ordered by eventName)
+    #       team b stats: (lex ordered by eventName)  
+    #       Game event reports: <time-name,\n,description> (time ordered)     
+    
+}
 
 void StompProtocol::sendFrame(string frame)
 {
@@ -213,6 +230,13 @@ void StompProtocol::MESSAGE(vector<string>& words)
 {
     cout << "Recieved message from topic: " + words[1].substr(13) << endl;
     cout << "Message content: " + words[4]<< endl;
+
+    #psodoCode:
+    #   create pair
+    #   create event (from message)
+    #   check if exists
+    #   insert value / make new list and insert event
+
 }
 
 void StompProtocol::RECEIPT(vector<string>& words)

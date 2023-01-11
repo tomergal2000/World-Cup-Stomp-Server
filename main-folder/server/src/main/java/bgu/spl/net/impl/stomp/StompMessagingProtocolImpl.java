@@ -17,16 +17,10 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
     private User user = null;
     // private ArrayList<String> allowedPrefix;
 
-    public void start(int connectionId, Connections<T> connections) {// who calls start()?
+    public void start(int connectionId, Connections<T> connections) {
         this.connectionId = connectionId;
         this.connections = (ConnectionsImpl<T>) connections;
         shouldTerminate = false;
-        // allowedPrefix.add("CONNECT");
-        // allowedPrefix.add("SEND");
-        // allowedPrefix.add("SUBSCRIBE");
-        // allowedPrefix.add("UNSUBSCRIBE");
-        // allowedPrefix.add("DISCONNECT");
-
     }
 
     public T process(T frame) {
@@ -67,20 +61,11 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
                     ERROR(3);
                 } else {
                     String msg = "MESSAGE\n";
-                    // int subscriptionId = -1;
-                    // go over my user's channels and find the right subId
-                    // ConcurrentHashMap<Integer, String> userSubs =
-                    // connections.ConIdToUser.get(connectionId)
-                    // .getSubIdToChanName();
-                    // for (Integer key : userSubs.keySet()) {
-                    // if (userSubs.get(key).equals(channel1))
-                    // subscriptionId = key;
-                    // }
                     msg += "subscription:";
                     msg += "message-id:" + connections.getMessageId() + '\n';
                     msg += "destination:/" + channel1 + '\n' + '\n';
                     for (int i = 2; i < words.size(); i++) {
-                        msg += words.get(i) + '\n';
+                        msg += words.get(i);
                     }
                     connections.send(channel1, (T) msg);
                 }
@@ -172,8 +157,8 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
     // }
 
     private void ERROR(int type) {
-
-        String frame = "ERROR\n";
+        int magic_number = (int)(Math.random() * 17000);
+        String frame = "ERROR\nreceipt-id:" + magic_number + "\n";
         String errorMessage = "";
 
         if (type == 0) {
