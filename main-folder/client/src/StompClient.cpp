@@ -1,11 +1,19 @@
 #include "../include/StompProtocol.h"
 #include <thread>
+#include <map>
+#include <list>
+#include "../include/Event.h"
+
+class event;
+
+using namespace std;
 
 int main(int argc, char *argv[]) {
-	
+	map <tuple<string, string>, list<&event>> tupleToEventList();
+
 	while(1){
 
-		StompProtocol* protocol = new StompProtocol();
+		StompProtocol* protocol = new StompProtocol(&tupleToEventList);
 		ConnectionHandler* handler = protocol->getHandler();
 
 		thread KEYBOARDTOSERVER([](StompProtocol* protocol){

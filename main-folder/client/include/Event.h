@@ -35,7 +35,9 @@ public:
     int get_time() const;
     const std::map<std::string, std::string> &get_game_updates() const;
     const std::map<std::string, std::string> &get_team_a_updates() const;
+    std::string &Event::fcku_a();
     const std::map<std::string, std::string> &get_team_b_updates() const;
+    std::string &Event::fcku_b();
     const std::string &get_discription() const;
 };
 

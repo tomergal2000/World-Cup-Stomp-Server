@@ -6,7 +6,7 @@ all: StompWCIClient
 # EchoClient: bin/ConnectionHandler.o bin/echoClient.o 
 # 	g++ -o bin/EchoClient bin/ConnectionHandler.o bin/echoClient.o $(LDFLAGS)
 
-StompWCIClient: bin/ConnectionHandler.o bin/StompClient.o bin/event.o bin/StompProtocol.o
+StompWCIClient: bin/ConnectionHandler.o bin/StompClient.o bin/Event.o bin/StompProtocol.o
 	g++ -o bin/StompWCIClient bin/ConnectionHandler.o bin/StompClient.o bin/StompProtocol.o $(LDFLAGS)
 
 bin/ConnectionHandler.o: src/ConnectionHandler.cpp
@@ -15,8 +15,8 @@ bin/ConnectionHandler.o: src/ConnectionHandler.cpp
 bin/echoClient.o: src/echoClient.cpp
 	g++ $(CFLAGS) -o bin/echoClient.o src/echoClient.cpp
 
-bin/event.o: src/event.cpp
-	g++ $(CFLAGS) -o bin/event.o src/event.cpp
+bin/Event.o: src/Event.cpp
+	g++ $(CFLAGS) -o bin/Event.o src/Event.cpp
 
 bin/StompClient.o: src/StompClient.cpp
 	g++ $(CFLAGS) -o bin/StompClient.o src/StompClient.cpp

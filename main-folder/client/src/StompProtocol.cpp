@@ -3,10 +3,12 @@
 #include "../include/StompProtocol.h"
 #include "../include/ConnectionHandler.h"
 #include <limits>
+#include <list>
+#include <vector>
 
 using namespace std;
 
-StompProtocol::StompProtocol() : username(""), subscriptionCounter(0), handler(nullptr), topicToSubId(), commandsLeft(0), shouldTerminate(false) {}
+StompProtocol::StompProtocol(map <tuple<string, string>, list<Event&>> & tupleToEventList) : username(""), subscriptionCounter(0), handler(nullptr), topicToSubId(), commandsLeft(0), shouldTerminate(false),tupleToEventList(tupleToEventList) {}
 
 StompProtocol::~StompProtocol(){
     if(handler != nullptr){
@@ -15,7 +17,7 @@ StompProtocol::~StompProtocol(){
     }
 }
 
-string StompProtocol::keyboardToFrame(string line)//**********************************//
+void StompProtocol::keyboardToFrame(string line)//**********************************//
 {
     string type;
     string frame = "";
@@ -34,30 +36,30 @@ string StompProtocol::keyboardToFrame(string line)//****************************
 
     if(username == "" && type != "login"){
         cout << "The client is not yet logged in" << endl;
-        return "";
     }
 
     if (type == "login"){
-        frame = CONNECT(words);
+        CONNECT(words);
         commandsLeft++;
     }
 
     else if(handler != nullptr){
         if (type == "join"){
-            frame = SUBSCRIBE(words);
+            SUBSCRIBE(words);
             commandsLeft++;
         }
         else if (type == "exit"){
-            frame = UNSUBSCRIBE(words);
+            UNSUBSCRIBE(words);
             commandsLeft++;
         }
         else if (type == "report") // TODO implement
-            frame = SEND(words);
+            SEND(words);
         
         else if (type == "logout"){
-            frame = DISCONNECT();
+            DISCONNECT();
             commandsLeft++;
         }
+    
 
         else
             cout << "bad command" << endl;
@@ -65,7 +67,7 @@ string StompProtocol::keyboardToFrame(string line)//****************************
 
     else cout << "Client not yet connected" << endl;
 
-    // TODO: support summarry + print error
+    // TODO: support summary + print error
     if(handler != nullptr && frame != "")
         handler->sendMessage(frame);
 
@@ -120,12 +122,11 @@ ConnectionHandler* StompProtocol::getHandler()
 
 // output functions:
 
-string StompProtocol::CONNECT(vector<string> &input)
+void StompProtocol::CONNECT(vector<string> &input)
 {
     if (username != "")
     {
         std::cout << "The client is already logged in, log out before trying again" << endl;
-        return "";
     }
 
     string frame = "CONNECT\n";
@@ -140,15 +141,36 @@ string StompProtocol::CONNECT(vector<string> &input)
     int port = stoi(input[2]);
     handler = new ConnectionHandler(host, port);
     handler->connect();
+    sendFrame(frame);
+}
+// WARNING: code is not yet good for unecessary spaces
+void StompProtocol::SEND(vector<string> &input)
+{
+    string fileName = input[1];
+    names_and_events names_and_events = parseEventsFile(fileName);
+    string opening = createSendFrameOpening(names_and_events);
+    string frame;
+    for(Event event : names_and_events.events){
+        frame = createSendFrame(opening, event);
+        sendFrame(frame);
+    } 
+}
+
+string StompProtocol::createSendFrame(string opening, Event& event){
+    string frame = opening + "event name:" + event.get_name() + "\n" + "time:" + to_string(event.get_time()) + "\n" +
+                   "team a updates:" + event.fcku_a() + "team b updates:" + event.fcku_b() + event.get_discription() + "\n\0"; 
     return frame;
 }
 
-string StompProtocol::SEND(vector<string> &input)
-{
-    return "";
+string StompProtocol::createSendFrameOpening(names_and_events& names_and_events){
+    string gameName = names_and_events.team_a_name + "-" + names_and_events.team_b_name;
+    string opening = "SEND\n";
+    opening += "destination:/" + gameName + "\n\n" + "user:" + username + "\n"
+    + "team a:" + names_and_events.team_a_name +  "team b:" + names_and_events.team_b_name + "\n";
+    return opening;
 }
 
-string StompProtocol::SUBSCRIBE(vector<string> &input)
+void StompProtocol::SUBSCRIBE(vector<string> &input)
 {
 
     string frame = "SUBSCRIBE" + '\n';
@@ -159,24 +181,30 @@ string StompProtocol::SUBSCRIBE(vector<string> &input)
     topicToSubId[input[1]] = subscriptionCounter;
 
     subscriptionCounter++;
-    return frame;
+    sendFrame(frame);
 }
 
-string StompProtocol::UNSUBSCRIBE(vector<string> &input)
+void StompProtocol::UNSUBSCRIBE(vector<string> &input)
 {
     string frame = "UNSUBSCRIBE" + '\n';
     int id = topicToSubId.at(input[1]);
     frame += "id:" + to_string(id) + '\n';
     frame += "receipt:" + to_string(id + 5) + '\n' + '\n' + '\0';
 
-    return frame;
+    sendFrame(frame);
 }
 
-string StompProtocol::DISCONNECT()
+void StompProtocol::DISCONNECT()
 {
     string frame = "DISCONNECT" + '\n';
     frame += "receipt:" + to_string(-1) + '\n' + '\n' + '\0';
-    return frame;
+    sendFrame(frame);
+}
+
+void StompProtocol::sendFrame(string frame)
+{
+    if(handler != nullptr && frame != "")
+        handler->sendMessage(frame);
 }
 
 // input functions:
