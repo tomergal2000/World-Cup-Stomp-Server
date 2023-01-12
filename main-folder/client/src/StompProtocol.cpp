@@ -168,7 +168,7 @@ string StompProtocol::createSendFrame(string opening, Event& event){
 }
 
 string StompProtocol::createSendFrameOpening(names_and_events& names_and_events){
-    string gameName = names_and_events.team_a_name + "-" + names_and_events.team_b_name;
+    string gameName = names_and_events.team_a_name + "_" + names_and_events.team_b_name;
     string opening = "SEND\n";
     opening += "destination:/" + gameName + "\n\n" + "user:" + username + "\n"
     + "team a:" + names_and_events.team_a_name +  "team b:" + names_and_events.team_b_name + "\n";
@@ -207,15 +207,36 @@ void StompProtocol::DISCONNECT()
 }
 void StompProtocol::SUMMARIZE(vector<string> &input){
 
-    # psodoCode
+   
+    string gameName = input[1];
+    string userName = input[2];
+    string fileName = input[3];
+    list<Event> eventsList = pairToEventList[<gameName , topicName>];
+    string toInsert="";
+    if(eventsList != null && !eventList.isEmpty()){
+        string toInsert= makeStats(input , eventsList, gameName);
+    }
+    #insert toInsert to file
+     
+
+      # psodoCode
     #   find file, if not exist make one
-    #   find relavent list in map
+    #   find relavent list in map- find userName, find topicName
     #   make string:
     #       headline (name a vs name b)
     #       team a stats: (lex ordered by eventName)
     #       team b stats: (lex ordered by eventName)  
     #       Game event reports: <time-name,\n,description> (time ordered)     
     
+
+     #   find file, if not exist make one
+}
+
+string StompProtocol::makeStats(vector<string> &input, list<Event> &eventsList , string gameName){
+    int index= gameName.find('_');
+    string stats= gameName.subString(0 , index) + " vs " + gameName.subString(index+1) + '\n'; 
+    stats+= "Game stats:\n"
+
 }
 
 void StompProtocol::sendFrame(string frame)

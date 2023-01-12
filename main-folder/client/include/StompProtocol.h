@@ -29,6 +29,7 @@ void SUBSCRIBE(vector<string>& input);
 void UNSUBSCRIBE(vector<string>& input);
 void DISCONNECT();
 void SUMMARIZE(vector<string>& input);
+string makeStats(vector<string> &input, list<Event> &eventsList, string gameName);
 void sendFrame(string frame);
 
 //serverToReaction is to use the following:
