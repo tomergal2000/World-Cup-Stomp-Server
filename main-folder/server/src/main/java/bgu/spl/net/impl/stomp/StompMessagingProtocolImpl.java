@@ -60,24 +60,16 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
                     break;
                 }
 
-                String channel1 = words.get(1).substring(1);
+                String channel1 = words.get(2).substring(1);
 
                 if (!connections.isSubscribed(connectionId, channel1)) {
                     ERROR(3);
                 } else {
-                    // String msg = "MESSAGE\n";
-                    // msg += "subscription:";
-                    // msg += "message-id:" + connections.getMessageId() + '\n';
-                    // msg += "destination:/" + channel1 + '\n' + '\n';
-                    // for (int i = 2; i < words.size(); i++) {
-                    //     msg += words.get(i);
-                    // }
-                    // connections.send(channel1, (T) msg);
                     String msg = "MESSAGE ";
                     msg += "subscription:";
                     msg += "message-id:" + connections.getMessageId();
-                    msg += "destination:/" + channel1;
-                    for (int i = 2; i < words.size(); i++) {
+                    msg += "destination:/" + channel1 +"\n\n"; //NOTICE WHEN TESTING WITH ECHOCLIENT.JAVA
+                    for (int i = 4; i < words.size(); i++) {
                         msg += words.get(i);
                     }
                     connections.send(channel1, (T) msg);
@@ -144,30 +136,32 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
         boolean isValue = false;
         int firstLineEnding = inFrame.indexOf('\n');
         words.add(inFrame.substring(0, firstLineEnding));
-        for (int c = firstLineEnding; c < inFrame.length(); c++) {// haha c++ but it's java
-            if (inFrame.charAt(c) == ':')
-                isValue = true;
-            else if (isValue) {
-                if (inFrame.charAt(c) != '\n' && inFrame.charAt(c) != '\u0000')
-                    word += inFrame.charAt(c);
-                else {
-                    words.add(word);
-                    word = "";
-                    isValue = false;
+        if(words.get(0) != "SEND"){
+            for (int c = firstLineEnding; c < inFrame.length(); c++) {// haha c++ but it's java
+                if (inFrame.charAt(c) == ':')
+                    isValue = true;
+                else if (isValue) {
+                    if (inFrame.charAt(c) != '\n' && inFrame.charAt(c) != '\u0000')
+                        word += inFrame.charAt(c);
+                    else {
+                        words.add(word);
+                        word = "";
+                        isValue = false;
+                    }
+                }
+            }
+        }
+        else{
+            words.remove(0);
+            String[] lines = inFrame.split("\n");
+            for(String line : lines){
+                for(String singleWord : line.split(":")){
+                    words.add(singleWord);
                 }
             }
         }
     }
 
-    // private boolean InputError1(T frame) {
-    // String check = (String) frame;
-    // if(check.length() < 11)
-    // return false;
-    // if(!allowedPrefix.contains(check.substring(0, 10)))
-
-    // return true;
-
-    // }
 
     private void ERROR(int type) {
         int magic_number = (int)(Math.random() * 17000);

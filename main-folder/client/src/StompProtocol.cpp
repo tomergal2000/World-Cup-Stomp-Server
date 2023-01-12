@@ -7,6 +7,8 @@
 #include <vector>
 #include <fstream>
 #include <iostream>
+#include <thread>
+
 
 using namespace std;
 
@@ -105,6 +107,7 @@ string StompProtocol::serverToReaction(string frame)
     type = words[0];
 
     // for debugging:
+    cout << "printing frame i got from server, word by word" << endl;
     for (string w : words)
         cout << w << endl;
 
@@ -222,6 +225,7 @@ void StompProtocol::DISCONNECT()
     string frame = "DISCONNECT" + '\n';
     frame += "receipt:" + to_string(-1) + '\n' + '\n' + '\0';
     sendFrame(frame);
+    sleep(0.2); //stop accepting keyboars requests for a moment! need to finish disconnecting...
 }
 void StompProtocol::SUMMARIZE(vector<string> &input)
 {
@@ -308,8 +312,13 @@ void StompProtocol::MESSAGE(vector<string> &words)
     cout << "Recieved message from topic: " + words[1].substr(13) << endl;
     cout << "Message content: " + words[4] << endl;
 
-    string gameName = words[3].substr(1);
-    pair<string, string> key(gameName, username);
+    string userName = words[5];
+    string gameName = words[3];
+    int slash = gameName.find('/');
+    int endOfLine = gameName.find('\n');//maybe we don't need this
+    gameName = gameName.substr(slash, endOfLine);
+
+    pair<string, string> key(gameName, userName);
     Event recieved = jesusCristWeNeedToCreateEvent(words);//incomplete function. jesus.
     list<Event&> eventList;
     bool listExists = (pairToEventList.count(key) != 0);
@@ -328,22 +337,41 @@ void StompProtocol::MESSAGE(vector<string> &words)
 Event StompProtocol::jesusCristWeNeedToCreateEvent(vector<string> &words)
 {
     string user = words[5];
-    string team_a = words[6];
-    string team_b = words[8];
-    string eventName = words[9];
-    int time = stoi(words[10]);
-    map<string, string> team_a_map = map<string, string>();
-    int wordsIndex = 12;
-    // while(words[wordsIndex] != "\n"){
-    //     string key = words[wordsIndex];
-    //     string value = words[wordsIndex];
-    //     pair<string, string> toPut(words[wordsIndex], );
-    //     team_a_map.insert(words[wordsIndex],);
-    //     wordsInex += 2;
-    // }
-    map<string, string> team_b_map = map<string, string>();
+    string team_a = words[7];
+    string team_b = words[9];
+    string eventName = words[11];
+    int time = stoi(words[13]);
+    
+
     map<string, string> fictionalGameUpdatesToSatisfyConstructor = map<string, string>();
-    string description = words[words.size() - 1];
+
+    //creation of team a map:
+    map<string, string> team_a_map = map<string, string>();
+    int wordsIndex = 15;
+    while(words[wordsIndex] != "team b updates"){
+        string key = words[wordsIndex];
+        string value = words[wordsIndex + 1];
+        team_a_map[key] = value;
+        wordsIndex += 2;
+    }
+
+    //creation of team b map:
+    map<string, string> team_b_map = map<string, string>();
+    wordsIndex++;
+    while(words[wordsIndex] != "description"){
+        string key = words[wordsIndex];
+        string value = words[wordsIndex + 1];
+        team_b_map[key] = value;
+        wordsIndex += 2;
+    }
+
+    wordsIndex++;
+    string description;
+    while(wordsIndex < words.size()){
+        description += words[wordsIndex] + " ";
+        wordsIndex++;
+    }
+
     return Event(team_a, team_b, eventName, time,
                  fictionalGameUpdatesToSatisfyConstructor, 
                  team_a_map, team_b_map, description);
