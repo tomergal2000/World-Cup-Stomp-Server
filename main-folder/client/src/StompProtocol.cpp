@@ -167,6 +167,8 @@ void StompProtocol::CONNECT(vector<string> &input)
     handler->connect();
     sendFrame(frame);
 }
+
+
 // WARNING: code is not yet good for unecessary spaces
 void StompProtocol::SEND(vector<string> &input)
 {
@@ -195,6 +197,9 @@ string StompProtocol::createSendFrameOpening(names_and_events &names_and_events)
     opening += "destination:/" + gameName + "\n\n" + "user:" + username + "\n" + "team a:" + names_and_events.team_a_name + "team b:" + names_and_events.team_b_name + "\n";
     return opening;
 }
+
+//*************************************** end of SEND ********************************************//
+
 
 void StompProtocol::SUBSCRIBE(vector<string> &input)
 {
@@ -227,6 +232,9 @@ void StompProtocol::DISCONNECT()
     sendFrame(frame);
     sleep(0.2); //stop accepting keyboars requests for a moment! need to finish disconnecting...
 }
+
+
+//********************** last input function: summarize + 2 aid functions **********************//
 void StompProtocol::SUMMARIZE(vector<string> &input)
 {
 
@@ -309,14 +317,13 @@ void StompProtocol::sendFrame(string frame)
 //used when we receive a message from the server. pushes event to relevant eventList.
 void StompProtocol::MESSAGE(vector<string> &words)
 {
-    cout << "Recieved message from topic: " + words[1].substr(13) << endl;
-    cout << "Message content: " + words[4] << endl;
-
     string userName = words[5];
+    cout << "recieved from username:" + userName << endl;
     string gameName = words[3];
     int slash = gameName.find('/');
     int endOfLine = gameName.find('\n');//maybe we don't need this
     gameName = gameName.substr(slash, endOfLine);
+    cout << "about game name:" + gameName << endl;
 
     pair<string, string> key(gameName, userName);
     Event recieved = jesusCristWeNeedToCreateEvent(words);//incomplete function. jesus.
@@ -337,10 +344,15 @@ void StompProtocol::MESSAGE(vector<string> &words)
 Event StompProtocol::jesusCristWeNeedToCreateEvent(vector<string> &words)
 {
     string user = words[5];
+    cout << "username: " + user << endl;
     string team_a = words[7];
+    cout << "team a name: " + team_a << endl;
     string team_b = words[9];
+    cout << "team b name: " + team_b << endl;
     string eventName = words[11];
+    cout << "name of event: " + eventName << endl;
     int time = stoi(words[13]);
+    cout << "time: " + words[13] << endl;
     
 
     map<string, string> fictionalGameUpdatesToSatisfyConstructor = map<string, string>();
@@ -350,7 +362,9 @@ Event StompProtocol::jesusCristWeNeedToCreateEvent(vector<string> &words)
     int wordsIndex = 15;
     while(words[wordsIndex] != "team b updates"){
         string key = words[wordsIndex];
+        cout << "update " + to_string(wordsIndex - 14) + " name:" + key << endl;
         string value = words[wordsIndex + 1];
+        cout << "update " + to_string(wordsIndex - 14) + " value:" + value << endl;
         team_a_map[key] = value;
         wordsIndex += 2;
     }
@@ -360,7 +374,9 @@ Event StompProtocol::jesusCristWeNeedToCreateEvent(vector<string> &words)
     wordsIndex++;
     while(words[wordsIndex] != "description"){
         string key = words[wordsIndex];
+        cout << "update " + to_string(wordsIndex - 14) + " name:" + key << endl;
         string value = words[wordsIndex + 1];
+        cout << "update " + to_string(wordsIndex - 14) + " value:" + value << endl;
         team_b_map[key] = value;
         wordsIndex += 2;
     }
@@ -371,11 +387,14 @@ Event StompProtocol::jesusCristWeNeedToCreateEvent(vector<string> &words)
         description += words[wordsIndex] + " ";
         wordsIndex++;
     }
+    cout << "description:" + description << endl;
 
     return Event(team_a, team_b, eventName, time,
                  fictionalGameUpdatesToSatisfyConstructor, 
                  team_a_map, team_b_map, description);
 }
+
+//****************************** end of the process of recieving a message *******************************//
 
 void StompProtocol::RECEIPT(vector<string> &words)
 {
