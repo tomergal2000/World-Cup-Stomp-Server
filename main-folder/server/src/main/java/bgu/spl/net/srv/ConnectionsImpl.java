@@ -45,7 +45,7 @@ public class ConnectionsImpl<T> implements Connections<T> {
     private String insertSubId(T msg, String subscrId) {
         String toSend = (String) msg;
         String edited = "";
-        edited += toSend.substring(0, 21) + subscrId + '\n';
+        edited += toSend.substring(0, 21) + subscrId + "\n";
         edited += toSend.substring(21);
         
         //for debugging:

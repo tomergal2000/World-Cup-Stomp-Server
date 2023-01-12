@@ -16,6 +16,7 @@ public class EchoClient {
         String testUNS = "UNSUBSCRIBE\nid:0\nreceipt:82\n\n\u0000";
         String testDIS = "DISCONNECT\nreceipt:113\n\n\u0000";
         String testCONERROR = "CONNECT\naccept-version:1.2\nhost:stomp.cs.bgu.ac.il\nlogin:meni\npasscode:mahasisma\n\n\u0000";
+        String testSEND = "SEND\ndestination:/germany_spain\nuser:meni\nteam a:germany\nteam b:spain\nevent name:kickoff\ntime:0\n\u0000";
 
         if (args.length == 0) {
             args = new String[]{"localhost", testCON};
@@ -48,29 +49,37 @@ public class EchoClient {
 
             line = in.readLine();
             System.out.println(line);
-            
-            System.out.println("sending DISCONNECT message to server: ");
-            out.write(testDIS);
+
+            System.out.println("sending SEND message to server: ");
+            out.write(testSEND);
             // out.newLine();
             out.flush();
 
             line = in.readLine();
             System.out.println(line);
+            
+            // System.out.println("sending DISCONNECT message to server: ");
+            // out.write(testDIS);
+            // // out.newLine();
+            // out.flush();
+
+            // line = in.readLine();
+            // System.out.println(line);
 
         }
-        try (Socket sock = new Socket(args[0], 7777);
-            BufferedReader in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()))) {
+        // try (Socket sock = new Socket(args[0], 7777);
+        //     BufferedReader in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+        //     BufferedWriter out = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()))) {
 
-            System.out.println("sending CONNECT message to server");
-            out.write(testCONERROR);
-            // out.newLine();
-            out.flush();
+        //     System.out.println("sending CONNECT message to server");
+        //     out.write(testCONERROR);
+        //     // out.newLine();
+        //     out.flush();
 
-            System.out.println("awaiting response");
-            String line = in.readLine();
-            System.out.println("message from server: ");
-            System.out.println(line);
-        }
+        //     System.out.println("awaiting response");
+        //     String line = in.readLine();
+        //     System.out.println("message from server: ");
+        //     System.out.println(line);
+        // }
     }
 }

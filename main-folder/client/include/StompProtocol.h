@@ -29,12 +29,14 @@ void SUBSCRIBE(vector<string>& input);
 void UNSUBSCRIBE(vector<string>& input);
 void DISCONNECT();
 void SUMMARIZE(vector<string>& input);
-string makeStats(vector<string> &input, list<Event> &eventsList, string gameName);
+string makeStats(vector<string> &input, list<Event&> &eventList, string gameName);
+void writeToFile(string toWrite, string fileName);
 void sendFrame(string frame);
 
 //serverToReaction is to use the following:
 void CONNECTED(vector<string>& input);
 void MESSAGE(vector<string>& input);
+Event jesusCristWeNeedToCreateEvent(vector<string>& input);
 void RECEIPT(vector<string>& input);
 void ERROR(vector<string>& input);
 

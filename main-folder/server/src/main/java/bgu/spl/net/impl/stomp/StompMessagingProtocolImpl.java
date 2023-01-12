@@ -32,6 +32,8 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
         stringToWords(words, message);
         String type = words.get(0);
 
+        System.out.println("###" + type + "***");
+
         switch (type) {
             case "CONNECT":
 
@@ -50,6 +52,9 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
                 break;
 
             case "SEND":
+
+                System.out.println("i'm inside case send");    
+
                 if (user == null) {
                     ERROR(5);
                     break;
@@ -60,10 +65,18 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
                 if (!connections.isSubscribed(connectionId, channel1)) {
                     ERROR(3);
                 } else {
-                    String msg = "MESSAGE\n";
+                    // String msg = "MESSAGE\n";
+                    // msg += "subscription:";
+                    // msg += "message-id:" + connections.getMessageId() + '\n';
+                    // msg += "destination:/" + channel1 + '\n' + '\n';
+                    // for (int i = 2; i < words.size(); i++) {
+                    //     msg += words.get(i);
+                    // }
+                    // connections.send(channel1, (T) msg);
+                    String msg = "MESSAGE ";
                     msg += "subscription:";
-                    msg += "message-id:" + connections.getMessageId() + '\n';
-                    msg += "destination:/" + channel1 + '\n' + '\n';
+                    msg += "message-id:" + connections.getMessageId();
+                    msg += "destination:/" + channel1;
                     for (int i = 2; i < words.size(); i++) {
                         msg += words.get(i);
                     }
