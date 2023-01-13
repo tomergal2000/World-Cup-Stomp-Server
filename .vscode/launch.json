@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch StompServer",
+            "request": "launch",
+            "mainClass": "bgu.spl.net.impl.stomp.StompServer",
+            "projectName": "server"
+        },
+        {
+            "type": "java",
             "name": "Launch EchoServer",
             "request": "launch",
             "mainClass": "bgu.spl.net.impl.echo.EchoServer",
@@ -19,7 +26,7 @@
             "program": "${workspaceFolder}/client/bin/StompWCIClient",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${fileDirname}",
+            "cwd": "/home/spl211/SPL/SPL_Assignment3/SPL231-Assignment3-student-template-2/client",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
@@ -42,7 +49,10 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/client/bin/EchoClient",
-            "args": ["127.0.0.1", "7777"],
+            "args": [
+                "127.0.0.1",
+                "7777"
+            ],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
