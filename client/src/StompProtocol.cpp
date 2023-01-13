@@ -18,7 +18,6 @@ StompProtocol::~StompProtocol()
     if (handler != nullptr)
     {
         delete handler;
-        handler = nullptr;
     }
 }
 
@@ -43,6 +42,7 @@ void StompProtocol::keyboardToFrame(string line) //*****************************
     if (username == "" && type != "login")
     {
         cout << "The client is not yet logged in" << endl;
+        return;
     }
 
     if (type == "login")
@@ -107,9 +107,8 @@ string StompProtocol::serverToReaction(string frame)
     type = words[0];
 
     // for debugging:
-    cout << "printing frame i got from server, word by word" << endl;
-    for (string w : words)
-        cout << w << endl;
+    cout << "printing frame i got from server: " + frame << endl;
+    
 
     if (type == "CONNECTED")
     {
@@ -151,7 +150,9 @@ void StompProtocol::CONNECT(vector<string> &input)
     if (username != "")
     {
         std::cout << "The client is already logged in, log out before trying again" << endl;
+        return;
     }
+
 
     string frame = "CONNECT\n";
     frame += "accept-version:1.2\n";
@@ -173,7 +174,7 @@ void StompProtocol::CONNECT(vector<string> &input)
         cout << inp << endl;
     }
 
-
+    username = input[2];
     handler = new ConnectionHandler(host, port);
     handler->connect();
     sendFrame(frame);
@@ -217,7 +218,10 @@ string StompProtocol::createSendFrameOpening(names_and_events &names_and_events)
 void StompProtocol::SUBSCRIBE(vector<string> &input)
 {
 
-    string frame = "SUBSCRIBE" + '\n';
+    for (string w : input)
+        cout << w << endl;
+
+    string frame = "SUBSCRIBE\n";
     frame += "destination:/" + input[1] + '\n';
     frame += "id:" + to_string(subscriptionCounter) + '\n';
     frame += "receipt:" + to_string(subscriptionCounter + 5) + '\n' + '\n';
@@ -225,25 +229,29 @@ void StompProtocol::SUBSCRIBE(vector<string> &input)
     topicToSubId[input[1]] = subscriptionCounter;
 
     subscriptionCounter++;
+    cout << frame << endl;
     sendFrame(frame);
 }
 
 void StompProtocol::UNSUBSCRIBE(vector<string> &input)
 {
-    string frame = "UNSUBSCRIBE" + '\n';
+    string frame = "UNSUBSCRIBE\n";
     int id = topicToSubId.at(input[1]);
     frame += "id:" + to_string(id) + '\n';
-    frame += "receipt:" + to_string(id + 5) + '\n' + '\n';
+    frame += "receipt:" + to_string(id + 5) + "\n\n";
 
+    cout << frame << endl;
     sendFrame(frame);
 }
 
 void StompProtocol::DISCONNECT()
 {
-    string frame = "DISCONNECT" + '\n';
-    frame += "receipt:" + to_string(-1) + '\n' + '\n';
+    string frame = "DISCONNECT\n";
+    frame += "receipt:" + to_string(-1) + "\n\n";
+    
+    cout << frame << endl;
     sendFrame(frame);
-    sleep(0.2); //stop accepting keyboars requests for a moment! need to finish disconnecting...
+    sleep(1); //stop accepting keyboars requests for a moment! need to finish disconnecting...
 }
 
 
@@ -414,7 +422,6 @@ void StompProtocol::RECEIPT(vector<string> &words)
     int receipt = stoi(words[1].substr(11));
     if (receipt == -1)
     {
-        delete handler;
         while (commandsLeft != 0)
         {
             cout << "busy-waiting" << endl; // hopefully this never happens
@@ -434,6 +441,5 @@ void StompProtocol::ERROR(vector<string> &words)
     {
         cout << words[i] << endl;
     }
-    delete handler;
     shouldTerminate = true;
 }

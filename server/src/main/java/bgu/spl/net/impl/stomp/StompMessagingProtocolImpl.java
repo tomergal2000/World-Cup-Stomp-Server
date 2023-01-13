@@ -64,10 +64,10 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
                 if (!connections.isSubscribed(connectionId, channel1)) {
                     ERROR(3);
                 } else {
-                    String msg = "MESSAGE ";
-                    msg += "subscription:";
-                    msg += "message-id:" + connections.getMessageId();
-                    msg += "destination:/" + channel1 +"\n\n"; //NOTICE WHEN TESTING WITH ECHOCLIENT.JAVA
+                    String msg = "MESSAGE\n";
+                    msg += "subscription:\n";
+                    msg += "message-id:" + connections.getMessageId() + "\n";
+                    msg += "destination:/" + channel1 +"\n\n";
                     for (int i = 4; i < words.size(); i++) {
                         msg += words.get(i);
                     }
@@ -86,7 +86,7 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
                 boolean legalSub = connections.subscribe(subId, channel2, connectionId);
 
                 if (legalSub) {
-                    String receipt1 = "RECEIPT receipt-id:" + words.get(3) + '\n';
+                    String receipt1 = "RECEIPT\nreceipt-id:" + words.get(3) + "\n\n";
                     connections.send(connectionId, (T) receipt1);
                 } else {
                     ERROR(6);
@@ -104,7 +104,7 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
                 if (channelName != null)
                     wasSubscribed = connections.unsubscribe(subId2, channelName, connectionId);
                 if (wasSubscribed) {
-                    String receipt2 = "RECEIPT" + '\n' + "receipt-id:" + words.get(2) + '\n' + '\n';
+                    String receipt2 = "RECEIPT\n" + "receipt-id:" + words.get(2) + "\n\n";
                     connections.send(connectionId, (T) receipt2);
                 } else {
                     ERROR(3);
@@ -117,7 +117,7 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
                     ERROR(5);
                     break;
                 }
-                String receipt = "RECEIPT receipt-id:-1" + '\n';
+                String receipt = "RECEIPT\nreceipt-id:-1\n\n";
                 connections.send(connectionId, (T) receipt);
                 connections.disconnect(connectionId);
                 shouldTerminate = true;

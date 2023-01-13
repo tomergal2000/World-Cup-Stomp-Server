@@ -21,14 +21,6 @@ int main(int argc, char *argv[])
 		thread KEYTHREAD(&KeyboardToServer::run, &kt);
 
 		// This is the main thread. It reads from the server and reacts.
-		//  while(!protocol.shouldTerminate){//maybe while(1)
-		//  	string ans;
-		//  	if(!handler->getMessage(ans)){
-		//  		cout << "Disconnected. Exiting...\n" << std::endl;
-		//  		break;
-		//  	}
-		//  	protocol.serverToReaction(ans);
-		//  }
 
 		ConnectionHandler *handler = protocol->getHandler(); // this might be not good bc it's null in the beginning...
 
@@ -49,7 +41,7 @@ int main(int argc, char *argv[])
 		}
 
 		KEYTHREAD.join();
-		delete (protocol);
+		// delete (protocol);
 		cout << "Disconnected. Exiting...\n"
 			 << std::endl;
 	}

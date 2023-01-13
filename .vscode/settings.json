@@ -1,9 +1,9 @@
 {
     "files.associations": {
-        "*.ipp": "cpp",
         "any": "cpp",
         "array": "cpp",
         "atomic": "cpp",
+        "bit": "cpp",
         "*.tcc": "cpp",
         "bitset": "cpp",
         "cctype": "cpp",
@@ -26,10 +26,11 @@
         "deque": "cpp",
         "forward_list": "cpp",
         "list": "cpp",
+        "map": "cpp",
+        "set": "cpp",
         "unordered_map": "cpp",
         "vector": "cpp",
         "exception": "cpp",
-        "filesystem": "cpp",
         "string_view": "cpp",
         "fstream": "cpp",
         "functional": "cpp",
@@ -50,6 +51,7 @@
         "sstream": "cpp",
         "stdexcept": "cpp",
         "streambuf": "cpp",
+        "string": "cpp",
         "system_error": "cpp",
         "thread": "cpp",
         "type_traits": "cpp",
@@ -57,7 +59,8 @@
         "typeindex": "cpp",
         "typeinfo": "cpp",
         "utility": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "variant": "cpp"
     },
-    "C_Cpp.errorSquiggles": "enabled"
+    "makefile.makefilePath": "client/"
 }
