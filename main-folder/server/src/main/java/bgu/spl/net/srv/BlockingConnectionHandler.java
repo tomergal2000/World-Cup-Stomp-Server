@@ -66,6 +66,7 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
         try{
         out.write(encdec.encode(msg));
         out.flush();
+        System.out.println("Server flushed the toilet to " + portId);
         }
         catch (IOException ex) {
             ex.printStackTrace();

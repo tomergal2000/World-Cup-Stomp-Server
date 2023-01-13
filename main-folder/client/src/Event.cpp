@@ -51,28 +51,13 @@ const std::map<std::string, std::string> &Event::get_team_a_updates() const
     return this->team_a_updates;
 }
 
-std::string &Event::fcku_a()
-{
-    std::string updates = "";
-    for(std::pair<std::string, std::string> update : team_a_updates){
-        updates += update.first + ":" + update.second + "\n";
-    }
-    return updates;
-} 
+
 
 const std::map<std::string, std::string> &Event::get_team_b_updates() const
 {
     return this->team_b_updates;
 }
 
-std::string &Event::fcku_b()
-{
-    std::string updates = "";
-    for(std::pair<std::string, std::string> update : team_b_updates){
-        updates += update.first + ":" + update.second + "\n";
-    }
-    return updates;
-}  
 
 const std::string &Event::get_discription() const
 {
@@ -131,3 +116,21 @@ names_and_events parseEventsFile(std::string json_path)
 
     return events_and_names;
 }
+
+std::string Event::fcku_a()
+{
+    std::string updates = "";
+    for(std::pair<std::string, std::string> update : team_a_updates){
+        updates += update.first + ":" + update.second + "\n";
+    }
+    return updates;
+} 
+
+std::string Event::fcku_b()
+{
+    std::string updates = "";
+    for(std::pair<std::string, std::string> update : team_b_updates){
+        updates += update.first + ":" + update.second + "\n";
+    }
+    return updates;
+}  

@@ -35,10 +35,13 @@ public:
     int get_time() const;
     const std::map<std::string, std::string> &get_game_updates() const;
     const std::map<std::string, std::string> &get_team_a_updates() const;
-    std::string &Event::fcku_a();
     const std::map<std::string, std::string> &get_team_b_updates() const;
-    std::string &Event::fcku_b();
     const std::string &get_discription() const;
+
+    // functions that took a lot of effort to create and we shouldn't be dealing with such things in the first place...
+    // they return a string of team_a_updates and team_b_updates respectively
+    std::string fcku_a();
+    std::string fcku_b();
 };
 
 // an object that holds the names of the teams and a vector of events, to be returned by the parseEventsFile function

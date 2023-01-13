@@ -3,7 +3,6 @@
 #include "../include/StompProtocol.h"
 #include "../include/ConnectionHandler.h"
 #include <limits>
-#include <list>
 #include <vector>
 #include <fstream>
 #include <iostream>
@@ -12,7 +11,7 @@
 
 using namespace std;
 
-StompProtocol::StompProtocol(map<pair<string, string>, list<Event &>> &pairToEventList) : username(""), subscriptionCounter(0), handler(nullptr), topicToSubId(), commandsLeft(0), shouldTerminate(false), pairToEventList(pairToEventList) {}
+StompProtocol::StompProtocol(map<pair<string, string>, vector<Event>> &pairToEventList) : username(""), subscriptionCounter(0), handler(nullptr), topicToSubId(), commandsLeft(0), shouldTerminate(false), pairToEventList(pairToEventList) {}
 
 StompProtocol::~StompProtocol()
 {
@@ -36,8 +35,8 @@ void StompProtocol::keyboardToFrame(string line) //*****************************
         words.push_back(word);
 
     // for debugging:
-    for (string w : words)
-        cout << w << endl;
+    // for (string w : words)
+    //     cout << w << endl;
 
     type = words[0];
 
@@ -96,6 +95,7 @@ void StompProtocol::keyboardToFrame(string line) //*****************************
 
 string StompProtocol::serverToReaction(string frame)
 { //**********************************//
+    cout << "This is the client here. I got a frame." << endl;
     string type;
     vector<string> words;
 
@@ -154,15 +154,26 @@ void StompProtocol::CONNECT(vector<string> &input)
     }
 
     string frame = "CONNECT\n";
-    frame += "accept-version 1.2\n";
+    frame += "accept-version:1.2\n";
 
-    string host = input[1];
+    string hostPort = input[1];
+    int indexNekudotaim = hostPort.find(':');
+    string host = hostPort.substr(0, indexNekudotaim);
+    int port = stoi(hostPort.substr(indexNekudotaim + 1));//not good
+    
 
-    frame = frame + "host:" + input[1] + '\n';
-    frame = frame + "login:" + input[3] + '\n';
-    frame = frame + "passcode:" + input[4] + '\n' + '\n' + '\0';
 
-    int port = stoi(input[2]);
+    frame = frame + "host:" + host + '\n';
+    frame = frame + "login:" + input[2] + '\n';
+    frame = frame + "passcode:" + input[3] + '\n' + '\n';
+
+    cout << frame << endl;
+
+    for(string inp : input){
+        cout << inp << endl;
+    }
+
+
     handler = new ConnectionHandler(host, port);
     handler->connect();
     sendFrame(frame);
@@ -185,8 +196,10 @@ void StompProtocol::SEND(vector<string> &input)
 
 string StompProtocol::createSendFrame(string opening, Event &event)
 {
+    string teamA_updates = event.fcku_a();
+    string teamB_updates = event.fcku_b();
     string frame = opening + "event name:" + event.get_name() + "\n" + "time:" + to_string(event.get_time()) + "\n" +
-                   "team a updates:" + event.fcku_a() + "team b updates:" + event.fcku_b() + event.get_discription() + "\n\0";
+                   "team a updates:" + teamA_updates + "team b updates:" + teamB_updates + event.get_discription() + "\n";
     return frame;
 }
 
@@ -207,7 +220,7 @@ void StompProtocol::SUBSCRIBE(vector<string> &input)
     string frame = "SUBSCRIBE" + '\n';
     frame += "destination:/" + input[1] + '\n';
     frame += "id:" + to_string(subscriptionCounter) + '\n';
-    frame += "receipt:" + to_string(subscriptionCounter + 5) + '\n' + '\n' + '\0';
+    frame += "receipt:" + to_string(subscriptionCounter + 5) + '\n' + '\n';
 
     topicToSubId[input[1]] = subscriptionCounter;
 
@@ -220,7 +233,7 @@ void StompProtocol::UNSUBSCRIBE(vector<string> &input)
     string frame = "UNSUBSCRIBE" + '\n';
     int id = topicToSubId.at(input[1]);
     frame += "id:" + to_string(id) + '\n';
-    frame += "receipt:" + to_string(id + 5) + '\n' + '\n' + '\0';
+    frame += "receipt:" + to_string(id + 5) + '\n' + '\n';
 
     sendFrame(frame);
 }
@@ -228,7 +241,7 @@ void StompProtocol::UNSUBSCRIBE(vector<string> &input)
 void StompProtocol::DISCONNECT()
 {
     string frame = "DISCONNECT" + '\n';
-    frame += "receipt:" + to_string(-1) + '\n' + '\n' + '\0';
+    frame += "receipt:" + to_string(-1) + '\n' + '\n';
     sendFrame(frame);
     sleep(0.2); //stop accepting keyboars requests for a moment! need to finish disconnecting...
 }
@@ -245,7 +258,7 @@ void StompProtocol::SUMMARIZE(vector<string> &input)
 
     try
     {
-        list<Event &> &eventList = pairToEventList.at(key);
+        vector<Event> &eventList = pairToEventList.at(key);
         string toInsert = makeStats(input, eventList, gameName);
         writeToFile(toInsert, fileName);
     }
@@ -255,7 +268,7 @@ void StompProtocol::SUMMARIZE(vector<string> &input)
     }
 }
 
-string StompProtocol::makeStats(vector<string> &input, list<Event &> &eventList, string gameName)
+string StompProtocol::makeStats(vector<string> &input, vector<Event> &eventList, string gameName)
 {
     int index = gameName.find('_');
     string team_a = gameName.substr(0, index);
@@ -327,14 +340,14 @@ void StompProtocol::MESSAGE(vector<string> &words)
 
     pair<string, string> key(gameName, userName);
     Event recieved = jesusCristWeNeedToCreateEvent(words);//incomplete function. jesus.
-    list<Event&> eventList;
+    vector<Event> eventList;
     bool listExists = (pairToEventList.count(key) != 0);
     if(listExists){
         eventList = pairToEventList.at(key);
         eventList.push_back(recieved);
     }
     else{
-        eventList = list<Event&>();
+        eventList = vector<Event>();
         eventList.push_back(recieved);
         pairToEventList[key] = eventList;
     }

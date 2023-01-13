@@ -3,52 +3,56 @@
 #include <map>
 #include <list>
 #include "../include/Event.h"
-
-class Event;
+#include "../include/KeyboardToServer.h"
 
 using namespace std;
 
-int main(int argc, char *argv[]) {
-	
-	map <pair<string, string>, list<Event&>> pairToEventList = map <pair<string, string>, list<Event&>>();
+int main(int argc, char *argv[])
+{
 
-	while(1){
+	map<pair<string, string>, vector<Event>> pairToEventList = map<pair<string, string>, vector<Event>>();
 
-		StompProtocol protocol = StompProtocol(pairToEventList);
-		ConnectionHandler* handler = protocol.getHandler();
+	while (1)
+	{
 
-		thread KEYBOARDTOSERVER([](StompProtocol& protocol){
-			while(!protocol.shouldTerminate) {//maybe while(1)
-				const short bufsize = 1024;
-				char buf[bufsize];
-				cin.getline(buf, bufsize);
-				string line(buf);
-				protocol.keyboardToFrame(line);//this also sends the frame
-			}
-		}, protocol);
+		StompProtocol *protocol = new StompProtocol(pairToEventList);
 
-		//This is the main thread. It reads from the server and reacts.
+		KeyboardToServer kt = KeyboardToServer(*protocol);
+		thread KEYTHREAD(&KeyboardToServer::run, &kt);
 
-		// while(!protocol.shouldTerminate){//maybe while(1)
-		// 	string ans;
-		// 	if(!handler->getMessage(ans)){
-		// 		cout << "Disconnected. Exiting...\n" << std::endl;
-		// 		break;
-		// 	}
-		// 	protocol.serverToReaction(ans);
-		// }
+		// This is the main thread. It reads from the server and reacts.
+		//  while(!protocol.shouldTerminate){//maybe while(1)
+		//  	string ans;
+		//  	if(!handler->getMessage(ans)){
+		//  		cout << "Disconnected. Exiting...\n" << std::endl;
+		//  		break;
+		//  	}
+		//  	protocol.serverToReaction(ans);
+		//  }
 
-		while(!protocol.shouldTerminate){
+		ConnectionHandler *handler = protocol->getHandler(); // this might be not good bc it's null in the beginning...
+
+		while (!protocol->shouldTerminate)
+		{
 			string ans;
-			if(handler->getMessage(ans))
-				protocol.serverToReaction(ans);
+			if (handler != nullptr)
+			{
+				cout << "waiting for message" << endl;
+				if (handler->getMessage(ans))
+				{
+					protocol->serverToReaction(ans);
+				}
+			}
+			else{
+				handler = protocol->getHandler();
+			}
 		}
 
-		cout << "Disconnected. Exiting...\n" << std::endl;
-
-		KEYBOARDTOSERVER.join();
-
-		return 0;
+		KEYTHREAD.join();
+		delete (protocol);
+		cout << "Disconnected. Exiting...\n"
+			 << std::endl;
 	}
 
+	return 0;
 }

@@ -32,12 +32,12 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
         stringToWords(words, message);
         String type = words.get(0);
 
-        System.out.println("###" + type + "***");
+        for(String line : words){
+            System.out.println(line);
+        }
 
         switch (type) {
             case "CONNECT":
-
-                System.out.println();
 
                 String username = words.get(3);
                 String password = words.get(4);
@@ -45,15 +45,14 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
                 if (returnVal != 0) {
                     ERROR(returnVal);
                 } else {
-                    String connected = "CONNECTED version:1.2" + '\n';
+                    String connected = "CONNECTED\nversion:1.2\n\n";
+                    System.out.println("Server is trying to send CONNECTED frame");
                     connections.send(connectionId, (T) connected);
                     user = connections.getUser(connectionId);
                 }
                 break;
 
             case "SEND":
-
-                System.out.println("i'm inside case send");    
 
                 if (user == null) {
                     ERROR(5);
