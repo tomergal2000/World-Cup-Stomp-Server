@@ -95,7 +95,6 @@ void StompProtocol::keyboardToFrame(string line) //*****************************
 
 string StompProtocol::serverToReaction(string frame)
 { //**********************************//
-    cout << "This is the client here. I got a frame." << endl;
     string type;
     vector<string> words;
 
@@ -127,7 +126,7 @@ string StompProtocol::serverToReaction(string frame)
     else if (type == "ERROR")
     {
         commandsLeft = 0;
-        ERROR(words);
+        ERROR(frame);
     }
 
     else
@@ -200,7 +199,7 @@ string StompProtocol::createSendFrame(string opening, Event &event)
     string teamA_updates = event.fcku_a();
     string teamB_updates = event.fcku_b();
     string frame = opening + "event name:" + event.get_name() + "\n" + "time:" + to_string(event.get_time()) + "\n" +
-                   "team a updates:" + teamA_updates + "team b updates:" + teamB_updates + event.get_discription() + "\n";
+                   "team a updates:" + teamA_updates + "\nteam b updates:" + teamB_updates + "\n" + "description:" + event.get_discription() + "\n";
     return frame;
 }
 
@@ -208,7 +207,7 @@ string StompProtocol::createSendFrameOpening(names_and_events &names_and_events)
 {
     string gameName = names_and_events.team_a_name + "_" + names_and_events.team_b_name;
     string opening = "SEND\n";
-    opening += "destination:/" + gameName + "\n\n" + "user:" + username + "\n" + "team a:" + names_and_events.team_a_name + "team b:" + names_and_events.team_b_name + "\n";
+    opening += "destination:/" + gameName + "\n\n" + "user:" + username + "\n" + "team a:" + names_and_events.team_a_name + "\nteam b:" + names_and_events.team_b_name + "\n";
     return opening;
 }
 
@@ -229,7 +228,6 @@ void StompProtocol::SUBSCRIBE(vector<string> &input)
     topicToSubId[input[1]] = subscriptionCounter;
 
     subscriptionCounter++;
-    cout << frame << endl;
     sendFrame(frame);
 }
 
@@ -240,7 +238,6 @@ void StompProtocol::UNSUBSCRIBE(vector<string> &input)
     frame += "id:" + to_string(id) + '\n';
     frame += "receipt:" + to_string(id + 5) + "\n\n";
 
-    cout << frame << endl;
     sendFrame(frame);
 }
 
@@ -249,7 +246,6 @@ void StompProtocol::DISCONNECT()
     string frame = "DISCONNECT\n";
     frame += "receipt:" + to_string(-1) + "\n\n";
     
-    cout << frame << endl;
     sendFrame(frame);
     sleep(1); //stop accepting keyboars requests for a moment! need to finish disconnecting...
 }
@@ -435,11 +431,9 @@ void StompProtocol::RECEIPT(vector<string> &words)
 }
 
 //prints the frame we got from the server and disconnects.
-void StompProtocol::ERROR(vector<string> &words)
+void StompProtocol::ERROR(string frame)
 {
-    for (int i = 3; i < words.size(); i++)
-    {
-        cout << words[i] << endl;
-    }
+    cout << frame << endl;
+    
     shouldTerminate = true;
 }

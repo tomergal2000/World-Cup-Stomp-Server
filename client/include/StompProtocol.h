@@ -36,7 +36,7 @@ void CONNECTED(vector<string>& input);
 void MESSAGE(vector<string>& input);
 Event jesusCristWeNeedToCreateEvent(vector<string>& input);
 void RECEIPT(vector<string>& input);
-void ERROR(vector<string>& input);
+void ERROR(string frame);
 
 
 public:

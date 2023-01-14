@@ -32,9 +32,9 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
         stringToWords(words, message);
         String type = words.get(0);
 
-        for(String line : words){
-            System.out.println(line);
-        }
+        // for(String line : words){
+        //     System.out.println(line);
+        // }
 
         switch (type) {
             case "CONNECT":
@@ -46,7 +46,6 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
                     ERROR(returnVal);
                 } else {
                     String connected = "CONNECTED\nversion:1.2\n\n";
-                    System.out.println("Server is trying to send CONNECTED frame");
                     connections.send(connectionId, (T) connected);
                     user = connections.getUser(connectionId);
                 }
@@ -71,6 +70,7 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
                     for (int i = 4; i < words.size(); i++) {
                         msg += words.get(i);
                     }
+                    System.out.println(msg);
                     connections.send(channel1, (T) msg);
                 }
                 break;

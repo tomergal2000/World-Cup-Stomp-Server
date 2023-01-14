@@ -74,7 +74,7 @@ public class ConnectionsImpl<T> implements Connections<T> {
         if (toCheck == null) {// means this user is new
             createNewUser(username, password, connectionId);
             return 0;
-        } else if (toCheck.getPassword() != password)
+        } else if (toCheck.getPassword().equals(password))
             return 1;
 
         else if (ConIdToUser.contains(toCheck))
@@ -133,7 +133,9 @@ public class ConnectionsImpl<T> implements Connections<T> {
 
     public boolean isSubscribed(int ConId, String channel){
         ArrayList<User> subscribedUsers = ChanNameToUserList.get(channel);
+        System.out.println("does channel list exist? " + subscribedUsers == null);
         User user = ConIdToUser.get(ConId);
+        System.out.println("does user exist? " + user == null);
         return subscribedUsers.contains(user);
     }
 
