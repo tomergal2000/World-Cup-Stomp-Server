@@ -58,17 +58,17 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
                     break;
                 }
 
-                String channel1 = words.get(2).substring(1);
+                String channel1 = words.get(1).substring(1);
 
                 if (!connections.isSubscribed(connectionId, channel1)) {
                     ERROR(3);
                 } else {
                     String msg = "MESSAGE\n";
-                    msg += "subscription:\n";
+                    msg += "subscription:";
                     msg += "message-id:" + connections.getMessageId() + "\n";
                     msg += "destination:/" + channel1 +"\n\n";
-                    for (int i = 4; i < words.size(); i++) {
-                        msg += words.get(i);
+                    for (String line : words) {
+                        msg += line + "\n";
                     }
                     System.out.println(msg);
                     connections.send(channel1, (T) msg);
@@ -153,11 +153,12 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
         else{
             words.remove(0);
             String[] lines = inFrame.split("\n");
-            for(String line : lines){
-                for(String singleWord : line.split(":")){
-                    words.add(singleWord);
-                }
+            System.out.println("lines after splitting: ");
+            for(int i = 2; i < lines.length; i++){
+                System.out.println(i + lines[i]);
+                words.add(lines[i]);
             }
+            System.out.println(words);
         }
     }
 

@@ -434,6 +434,9 @@ void StompProtocol::RECEIPT(vector<string> &words)
 void StompProtocol::ERROR(string frame)
 {
     cout << frame << endl;
-    
+    if(handler){
+        delete handler;
+        handler = nullptr;
+    }
     shouldTerminate = true;
 }
