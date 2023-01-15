@@ -1,7 +1,7 @@
 package bgu.spl.net.srv;
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;//TODO: maybe blocking list bc user can try to connect concurrently from 2 computers (clients)
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ConnectionsImpl<T> implements Connections<T> {
@@ -57,7 +57,10 @@ public class ConnectionsImpl<T> implements Connections<T> {
     public void disconnect(int connectionId) {
         User user = ConIdToUser.get(connectionId);
         if(user != null){
-            ConIdToUser.get(connectionId).unsubscribeAll();
+            for(ArrayList<User> userList : ChanNameToUserList.values()){
+                userList.remove(user);
+            }
+            user.unsubscribeAll();
         }
         ConIdToHandler.remove(connectionId);
         ConIdToUser.remove(connectionId);
@@ -137,6 +140,8 @@ public class ConnectionsImpl<T> implements Connections<T> {
     public boolean isSubscribed(int ConId, String channel){
         ArrayList<User> subscribedUsers = ChanNameToUserList.get(channel);
         User user = ConIdToUser.get(ConId);
+        if(subscribedUsers==null)
+            return false;
         return subscribedUsers.contains(user);
     }
 
