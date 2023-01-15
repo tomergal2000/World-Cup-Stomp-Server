@@ -10,7 +10,7 @@ using namespace std;
 int main(int argc, char *argv[])
 {
 
-	map<pair<string, string>, vector<Event>> pairToEventList = map<pair<string, string>, vector<Event>>();
+	map<pair<string, string>, vector<Event>*> pairToEventList = map<pair<string, string>, vector<Event>*>();
 
 	while (1)
 	{
@@ -42,9 +42,11 @@ int main(int argc, char *argv[])
 
 		KEYTHREAD.join();
 		// delete (protocol);
-		cout << "Disconnected. Exiting...\n"
-			 << std::endl;
+		cout << "Disconnected. Exiting...\n" << std::endl;
 	}
-
+	//delete the eventLists
+	for(pair<pair<string, string>, vector<Event>*> keyValue : pairToEventList){
+		delete &keyValue.second;
+	}
 	return 0;
 }

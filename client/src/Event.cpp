@@ -121,7 +121,7 @@ std::string Event::fcku_a()
 {
     std::string updates = "";
     for(std::pair<std::string, std::string> update : team_a_updates){
-        updates += "    " + update.first + ":" + update.second + "\n";
+        updates += "    " + update.first + ": " + update.second + "\n";
     }
     return updates;
 } 
@@ -130,7 +130,7 @@ std::string Event::fcku_b()
 {
     std::string updates = "";
     for(std::pair<std::string, std::string> update : team_b_updates){
-        updates += "    " + update.first + ":" + update.second + "\n";
+        updates += "    " + update.first + ": " + update.second + "\n";
     }
     return updates;
 }  

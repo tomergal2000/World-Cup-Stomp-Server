@@ -13,7 +13,6 @@ ConnectionHandler::ConnectionHandler(string host, short port) : host_(host), por
 
 ConnectionHandler::~ConnectionHandler() {
 	close();
-	sleep(0.1);
 }
 
 bool ConnectionHandler::connect() {

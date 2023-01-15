@@ -13,6 +13,7 @@ void KeyboardToServer::run() {
         string line(buf);
         if(line.length() > 1)
             protocol->keyboardToFrame(line);
+        sleep(1);
     }
 }
 

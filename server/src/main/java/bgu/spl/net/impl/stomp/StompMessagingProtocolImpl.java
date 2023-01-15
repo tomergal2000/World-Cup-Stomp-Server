@@ -25,7 +25,7 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
 
     public T process(T frame) {
 
-        System.out.println("I received the frame: " + (String) frame);
+        System.out.println("I received the frame:\n" + (String) frame);
 
         String message = (String) frame;
         ArrayList<String> words = new ArrayList<String>();
@@ -58,7 +58,7 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
                     break;
                 }
 
-                String channel1 = words.get(1).substring(1);
+                String channel1 = words.get(1).substring(13);
 
                 if (!connections.isSubscribed(connectionId, channel1)) {
                     ERROR(3);
@@ -67,10 +67,9 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
                     msg += "subscription:";
                     msg += "message-id:" + connections.getMessageId() + "\n";
                     msg += "destination:/" + channel1 +"\n\n";
-                    for (String line : words) {
-                        msg += line + "\n";
+                    for (int i = 3; i < words.size(); i++) {
+                        msg += words.get(i) + "\n";
                     }
-                    System.out.println(msg);
                     connections.send(channel1, (T) msg);
                 }
                 break;
@@ -135,7 +134,7 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
         boolean isValue = false;
         int firstLineEnding = inFrame.indexOf('\n');
         words.add(inFrame.substring(0, firstLineEnding));
-        if(words.get(0) != "SEND"){
+        if(!words.get(0).equals("SEND")){
             for (int c = firstLineEnding; c < inFrame.length(); c++) {// haha c++ but it's java
                 if (inFrame.charAt(c) == ':')
                     isValue = true;
@@ -154,11 +153,10 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
             words.remove(0);
             String[] lines = inFrame.split("\n");
             System.out.println("lines after splitting: ");
-            for(int i = 2; i < lines.length; i++){
-                System.out.println(i + lines[i]);
-                words.add(lines[i]);
+            for(String line : lines){
+                System.out.println(line);
+                words.add(line);
             }
-            System.out.println(words);
         }
     }
 
@@ -197,3 +195,9 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
         // implement actual closing (terminate function)
     }
 }
+
+/*  login 127.0.0.1:7777 tomer gal 
+ *  join Germany_Japan
+ *  report data/events1.json
+ *  summary Germany_Japan tomer fileName
+ */

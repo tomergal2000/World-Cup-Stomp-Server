@@ -55,7 +55,10 @@ public class ConnectionsImpl<T> implements Connections<T> {
     }
 
     public void disconnect(int connectionId) {
-        ConIdToUser.get(connectionId).unsubscribeAll();
+        User user = ConIdToUser.get(connectionId);
+        if(user != null){
+            ConIdToUser.get(connectionId).unsubscribeAll();
+        }
         ConIdToHandler.remove(connectionId);
         ConIdToUser.remove(connectionId);
     }
@@ -74,7 +77,7 @@ public class ConnectionsImpl<T> implements Connections<T> {
         if (toCheck == null) {// means this user is new
             createNewUser(username, password, connectionId);
             return 0;
-        } else if (toCheck.getPassword().equals(password))
+        } else if (!toCheck.getPassword().equals(password))
             return 1;
 
         else if (ConIdToUser.contains(toCheck))
@@ -133,9 +136,7 @@ public class ConnectionsImpl<T> implements Connections<T> {
 
     public boolean isSubscribed(int ConId, String channel){
         ArrayList<User> subscribedUsers = ChanNameToUserList.get(channel);
-        System.out.println(subscribedUsers == null);
         User user = ConIdToUser.get(ConId);
-        System.out.println(user == null);
         return subscribedUsers.contains(user);
     }
 
