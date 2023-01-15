@@ -25,6 +25,8 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
 
     public T process(T frame) {
 
+        System.out.println(connectionId);
+
         System.out.println("I received the frame:\n" + (String) frame);
 
         String message = (String) frame;
@@ -196,7 +198,7 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
     }
 }
 
-/*  login 127.0.0.1:7777 tomer gal 
+/*  login 127.0.0.1:7777 amit katz 
  *  join Germany_Japan
  *  report data/events1.json
  *  summary Germany_Japan tomer fileName

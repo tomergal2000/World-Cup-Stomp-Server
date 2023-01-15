@@ -37,8 +37,9 @@ public class ConnectionsImpl<T> implements Connections<T> {
         ArrayList<User> subscribedUsers = ChanNameToUserList.get(channel);
         
         for (User user : subscribedUsers) {
-            msg = (T)insertSubId(msg, user.getSubId(channel).toString());
-            ConIdToHandler.get(user.getConId()).send(msg);
+            T specMessage=msg;
+            specMessage = (T)insertSubId(specMessage, user.getSubId(channel).toString());
+            ConIdToHandler.get(user.getConId()).send(specMessage);
         }
     }
 
