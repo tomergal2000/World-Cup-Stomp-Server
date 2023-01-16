@@ -294,28 +294,31 @@ string StompProtocol::makeStats(vector<string> &input, vector<Event> *eventList,
     {
         map<string, string> teamAUpdatesInEvent = event.get_team_a_updates();
         //copy contents:
-        for(pair<string, string> keyValue1 : teamAUpdatesInEvent){
-            teamAUpdatesToAdd[keyValue1.first] = keyValue1.second;
+        for(const pair<string, string> keyValue1 : teamAUpdatesInEvent){
+            string key = keyValue1.first;
+            string value = keyValue1.second;
+            cout << teamAUpdatesToAdd.count(key) << endl;
+            teamAUpdatesToAdd[key] = value;
         }
-        //add to string:
-        for(pair<string, string> keyValue2 : teamAUpdatesToAdd){
-            cout << keyValue2.first << keyValue2.second << endl;
-            stats += "    " + keyValue2.first + keyValue2.second + "\n";
-        }
+    }
+    //add to string:
+    for(const pair<string, string> keyValue2 : teamAUpdatesToAdd){
+        cout << keyValue2.first << keyValue2.second << endl;
+        stats += "    " + keyValue2.first + keyValue2.second + "\n";
     }
 
     stats += team_b + " stats:\n";
     for (Event event : *eventList)
     {
         map<string, string> teamBUpdatesInEvent = event.get_team_a_updates();
-    
+        //copy contents:
         for(pair<string, string> keyValue3 : teamBUpdatesInEvent){
             teamBUpdatesToAdd[keyValue3.first] = keyValue3.second;
         }
-        for(pair<string, string> keyValue4 : teamBUpdatesToAdd){
-            stats += "    " + keyValue4.first + keyValue4.second + "\n";
-        }
-        
+    }
+    //add to string:
+    for(pair<string, string> keyValue4 : teamBUpdatesToAdd){
+        stats += "    " + keyValue4.first + keyValue4.second + "\n";
     }
 
     stats += "\nGame event reports:\n";
