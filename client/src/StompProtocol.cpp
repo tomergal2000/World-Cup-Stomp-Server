@@ -255,7 +255,7 @@ void StompProtocol::DISCONNECT()
 }
 
 
-//********************** last input function: summarize + 2 aid functions **********************//
+//********************** last output function: summarize + 2 aid functions **********************//
 void StompProtocol::SUMMARIZE(vector<string> &input)
 {
 
@@ -285,15 +285,37 @@ string StompProtocol::makeStats(vector<string> &input, vector<Event> *eventList,
 
     stats += "Game stats:\n" + team_a + " stats:\n";
 
+    map<string, string> teamAUpdatesToAdd = map<string, string>();
+    map<string, string> teamBUpdatesToAdd = map<string, string>();
+
+
+    //go over both team's updtaes, copy contents to unique (ToAdd) map, then add them to the string
     for (Event event : *eventList)
     {
-        stats += event.fcku_a();
+        map<string, string> teamAUpdatesInEvent = event.get_team_a_updates();
+        //copy contents:
+        for(pair<string, string> keyValue1 : teamAUpdatesInEvent){
+            teamAUpdatesToAdd[keyValue1.first] = keyValue1.second;
+        }
+        //add to string:
+        for(pair<string, string> keyValue2 : teamAUpdatesToAdd){
+            cout << keyValue2.first << keyValue2.second << endl;
+            stats += "    " + keyValue2.first + keyValue2.second + "\n";
+        }
     }
 
-    stats += "\n" + team_b + " stats:\n";
+    stats += team_b + " stats:\n";
     for (Event event : *eventList)
     {
-        stats += event.fcku_a();
+        map<string, string> teamBUpdatesInEvent = event.get_team_a_updates();
+    
+        for(pair<string, string> keyValue3 : teamBUpdatesInEvent){
+            teamBUpdatesToAdd[keyValue3.first] = keyValue3.second;
+        }
+        for(pair<string, string> keyValue4 : teamBUpdatesToAdd){
+            stats += "    " + keyValue4.first + keyValue4.second + "\n";
+        }
+        
     }
 
     stats += "\nGame event reports:\n";

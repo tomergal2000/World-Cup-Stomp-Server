@@ -1,13 +1,11 @@
 package bgu.spl.net.impl.stomp;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
 
 import bgu.spl.net.api.StompMessagingProtocol;
 import bgu.spl.net.srv.Connections;
 import bgu.spl.net.srv.ConnectionsImpl;
 import bgu.spl.net.srv.User;
-
-import java.util.ArrayList;
 
 public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> {
 
@@ -201,5 +199,5 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
 /*  login 127.0.0.1:7777 amit katz 
  *  join Germany_Japan
  *  report data/events1.json
- *  summary Germany_Japan tomer fileName
+ *  summary Germany_Japan amit fileName
  */
