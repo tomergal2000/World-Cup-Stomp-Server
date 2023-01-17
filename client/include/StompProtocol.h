@@ -41,9 +41,9 @@ void ERROR(string frame);
 
 public:
 bool shouldTerminate;
-~StompProtocol();
-
 ConnectionHandler* handler;
+
+~StompProtocol();
 
 StompProtocol(map <pair<string, string> , vector<Event>*> & pairToEventList);
 void keyboardToFrame(string line);

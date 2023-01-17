@@ -11,6 +11,7 @@
 
 using namespace std;
 
+// handler nullptr
 StompProtocol::StompProtocol(map<pair<string, string>, vector<Event>*> &pairToEventList) : username(""), subscriptionCounter(0), handler(nullptr), topicToSubId(), commandsLeft(0), shouldTerminate(false), pairToEventList(pairToEventList) {}
 
 StompProtocol::~StompProtocol()
@@ -294,17 +295,14 @@ string StompProtocol::makeStats(vector<string> &input, vector<Event> *eventList,
     {
         map<string, string> teamAUpdatesInEvent = event.get_team_a_updates();
         //copy contents:
-        for(const pair<string, string> keyValue1 : teamAUpdatesInEvent){
-            string key = keyValue1.first;
-            string value = keyValue1.second;
-            cout << teamAUpdatesToAdd.count(key) << endl;
-            teamAUpdatesToAdd[key] = value;
+        for(pair<string, string> keyValue : teamAUpdatesInEvent){
+            teamAUpdatesToAdd[keyValue.first] = keyValue.second;
         }
     }
     //add to string:
-    for(const pair<string, string> keyValue2 : teamAUpdatesToAdd){
-        cout << keyValue2.first << keyValue2.second << endl;
-        stats += "    " + keyValue2.first + keyValue2.second + "\n";
+    for(const pair<string, string> keyValue : teamAUpdatesToAdd){
+        cout << keyValue.first << keyValue.second << endl;
+        stats += "    " + keyValue.first + keyValue.second + "\n";
     }
 
     stats += team_b + " stats:\n";
@@ -312,13 +310,13 @@ string StompProtocol::makeStats(vector<string> &input, vector<Event> *eventList,
     {
         map<string, string> teamBUpdatesInEvent = event.get_team_a_updates();
         //copy contents:
-        for(pair<string, string> keyValue3 : teamBUpdatesInEvent){
-            teamBUpdatesToAdd[keyValue3.first] = keyValue3.second;
+        for(pair<string, string> keyValue : teamBUpdatesInEvent){
+            teamBUpdatesToAdd[keyValue.first] = keyValue.second;
         }
     }
     //add to string:
-    for(pair<string, string> keyValue4 : teamBUpdatesToAdd){
-        stats += "    " + keyValue4.first + keyValue4.second + "\n";
+    for(pair<string, string> keyValue : teamBUpdatesToAdd){
+        stats += "    " + keyValue.first + keyValue.second + "\n";
     }
 
     stats += "\nGame event reports:\n";
@@ -386,7 +384,7 @@ Event StompProtocol::jesusCristWeNeedToCreateEvent(vector<string> &words)
     string team_a = words[6].substr(2);
     string team_b = words[8].substr(2);
     string eventName = "";
-    int index = 11;
+    long unsigned int index = 11;
     string toStop = "time:";
     while(words[index] != toStop){
         eventName += words[index] + " ";
