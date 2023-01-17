@@ -301,14 +301,13 @@ string StompProtocol::makeStats(vector<string> &input, vector<Event> *eventList,
     }
     //add to string:
     for(const pair<string, string> keyValue : teamAUpdatesToAdd){
-        cout << keyValue.first << keyValue.second << endl;
         stats += "    " + keyValue.first + keyValue.second + "\n";
     }
 
     stats += team_b + " stats:\n";
     for (Event event : *eventList)
     {
-        map<string, string> teamBUpdatesInEvent = event.get_team_a_updates();
+        map<string, string> teamBUpdatesInEvent = event.get_team_b_updates();
         //copy contents:
         for(pair<string, string> keyValue : teamBUpdatesInEvent){
             teamBUpdatesToAdd[keyValue.first] = keyValue.second;
