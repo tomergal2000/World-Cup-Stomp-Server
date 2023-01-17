@@ -12,7 +12,7 @@
 using namespace std;
 
 // handler nullptr
-StompProtocol::StompProtocol(map<pair<string, string>, vector<Event>*> &pairToEventList) : username(""), subscriptionCounter(0), handler(nullptr), topicToSubId(), commandsLeft(0), shouldTerminate(false), pairToEventList(pairToEventList) {}
+StompProtocol::StompProtocol(map<pair<string, string>, vector<Event>*> &pairToEventList) : username(""), subscriptionCounter(0), commandsLeft(0), topicToSubId(),  pairToEventList(pairToEventList), shouldTerminate(false), handler(nullptr){}
 
 StompProtocol::~StompProtocol()
 {
@@ -271,7 +271,7 @@ void StompProtocol::SUMMARIZE(vector<string> &input)
         string toInsert = makeStats(input, eventList, gameName);
         writeToFile(toInsert, fileName);
     }
-    catch (out_of_range e)
+    catch (out_of_range &e)
     {
         cout << "no reports were recieved from this user on that topic" << endl;
     }

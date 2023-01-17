@@ -40,12 +40,14 @@ void ERROR(string frame);
 
 
 public:
+StompProtocol(map <pair<string, string> , vector<Event>*> & pairToEventList);
+
 bool shouldTerminate;
 ConnectionHandler* handler;
 
 ~StompProtocol();
 
-StompProtocol(map <pair<string, string> , vector<Event>*> & pairToEventList);
+
 void keyboardToFrame(string line);
 string serverToReaction(string frame);
 ConnectionHandler* getHandler();
