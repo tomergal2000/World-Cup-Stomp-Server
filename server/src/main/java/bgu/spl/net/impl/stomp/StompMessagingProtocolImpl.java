@@ -13,7 +13,6 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
     private ConnectionsImpl<T> connections;
     private boolean shouldTerminate;
     private User user = null;
-    // private ArrayList<String> allowedPrefix;
 
     public void start(int connectionId, Connections<T> connections) {
         this.connectionId = connectionId;
@@ -23,18 +22,10 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
 
     public T process(T frame) {
 
-        System.out.println(connectionId);
-
-        System.out.println("I received the frame:\n" + (String) frame);
-
         String message = (String) frame;
         ArrayList<String> words = new ArrayList<String>();
         stringToWords(words, message);
         String type = words.get(0);
-
-        // for(String line : words){
-        //     System.out.println(line);
-        // }
 
         switch (type) {
             case "CONNECT":
@@ -152,9 +143,7 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
         else{
             words.remove(0);
             String[] lines = inFrame.split("\n");
-            System.out.println("lines after splitting: ");
             for(String line : lines){
-                System.out.println(line);
                 words.add(line);
             }
         }
@@ -192,12 +181,7 @@ public class StompMessagingProtocolImpl<T> implements StompMessagingProtocol<T> 
 
     public boolean shouldTerminate() {
         return this.shouldTerminate;
-        // implement actual closing (terminate function)
     }
 }
 
-/*  login 127.0.0.1:7777 amit katz 
- *  join Germany_Japan
- *  report data/events1.json
- *  summary Germany_Japan amit fileName
- */
+

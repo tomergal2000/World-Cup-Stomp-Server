@@ -29,7 +29,6 @@ int main(int argc, char *argv[])
 			string ans;
 			if (handler != nullptr)
 			{
-				cout << "waiting for message" << endl;
 				if (handler->getMessage(ans))
 				{
 					protocol->serverToReaction(ans);
@@ -41,7 +40,6 @@ int main(int argc, char *argv[])
 		}
 
 		KEYTHREAD.join();
-		// delete (protocol);
 		cout << "Disconnected. Exiting...\n" << std::endl;
 	}
 	//delete the eventLists

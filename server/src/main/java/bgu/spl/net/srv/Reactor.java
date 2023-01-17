@@ -101,12 +101,11 @@ public class Reactor<T> implements Server<T> {
     private void handleAccept(ServerSocketChannel serverChan, Selector selector) throws IOException {
         SocketChannel clientChan = serverChan.accept();
 
-        //check that clienSock is unique. if not - return ERROR frame.
-        //also make sure username is not already connected.
-        
         clientChan.configureBlocking(false);
+        
         final NonBlockingConnectionHandler<T> handler;
-        if(isStomp){
+        
+        if(isStomp){//then use the stomp constructor
                 handler = new NonBlockingConnectionHandler<T>(
                 readerFactory.get(),
                 (StompMessagingProtocolImpl<T>)protocolFactory.get(),

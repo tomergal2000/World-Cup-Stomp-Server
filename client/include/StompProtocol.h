@@ -41,15 +41,12 @@ void ERROR(string frame);
 
 public:
 StompProtocol(map <pair<string, string> , vector<Event>*> & pairToEventList);
-
 bool shouldTerminate;
 ConnectionHandler* handler;
-
 ~StompProtocol();
 
-
 void keyboardToFrame(string line);
-string serverToReaction(string frame);
+void serverToReaction(string frame);
 ConnectionHandler* getHandler();
 StompProtocol(const StompProtocol&);
 StompProtocol& operator=(const StompProtocol&);

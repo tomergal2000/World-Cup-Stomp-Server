@@ -1,6 +1,6 @@
 package bgu.spl.net.srv;
 
-import java.util.ArrayList;//TODO: maybe blocking list bc user can try to connect concurrently from 2 computers (clients)
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -68,7 +68,7 @@ public class ConnectionsImpl<T> implements Connections<T> {
     }
 
     public void addHandler(Integer conId, ConnectionHandler handler) {
-        ConIdToHandler.put(conId , handler);
+        ConIdToHandler.put(conId, handler);
     }
 
     // assumes that client is not yet logged in

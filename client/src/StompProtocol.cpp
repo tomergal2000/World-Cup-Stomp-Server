@@ -25,18 +25,18 @@ StompProtocol::~StompProtocol()
 void StompProtocol::keyboardToFrame(string line) //**********************************//
 {
     string type;
-    string frame = "";
     vector<string> words;
     bool shouldDisconnect = false;
+    string frame = "";
+
+    if (line == ""){
+        return;
+    }
 
     stringstream ss(line);
     string word;
     while (ss >> word)
         words.push_back(word);
-
-    // for debugging:
-    // for (string w : words)
-    //     cout << w << endl;
 
     type = words[0];
     string empty = "";
@@ -71,7 +71,7 @@ void StompProtocol::keyboardToFrame(string line) //*****************************
             UNSUBSCRIBE(words);
             commandsLeft++;
         }
-        else if (type == report) // TODO implement
+        else if (type == report)
             SEND(words);
 
         else if (type == logout)
@@ -94,7 +94,6 @@ void StompProtocol::keyboardToFrame(string line) //*****************************
     else
         cout << "Client not yet connected" << endl;
 
-    // TODO: support summary + print error
     if (handler != nullptr && frame != empty)
         handler->sendMessage(frame);
 
@@ -102,8 +101,8 @@ void StompProtocol::keyboardToFrame(string line) //*****************************
         shouldTerminate = true;
 }
 
-string StompProtocol::serverToReaction(string frame)
-{ //**********************************//
+void StompProtocol::serverToReaction(string frame)
+{
     string type;
     vector<string> words;
 
@@ -114,8 +113,7 @@ string StompProtocol::serverToReaction(string frame)
 
     type = words[0];
 
-    // for debugging:
-    cout << "printing frame i got from server:\n" + frame << endl;
+    cout << "Frame received from server:\n" + frame << endl;
     
     string connected = "CONNECTED";
     string message = "MESSAGE";
@@ -127,6 +125,7 @@ string StompProtocol::serverToReaction(string frame)
         cout << "Login successful" << endl;
         commandsLeft--;
     }
+
     else if (type == message)
         MESSAGE(words);
 
@@ -145,9 +144,6 @@ string StompProtocol::serverToReaction(string frame)
     else
         std::cout << "bad frame from server" << endl;
 
-    // TODO: return type?
-
-    return frame;
 }
 
 ConnectionHandler *StompProtocol::getHandler()
@@ -176,8 +172,6 @@ void StompProtocol::CONNECT(vector<string> &input)
     string portString = hostPort.substr(indexNekudotaim + 1);
     int port = stoi(portString);
     
-
-
     frame = frame + "host:" + host + '\n';
     frame = frame + "login:" + input[2] + '\n';
     frame = frame + "passcode:" + input[3] + '\n' + '\n';
@@ -189,7 +183,6 @@ void StompProtocol::CONNECT(vector<string> &input)
 }
 
 
-// WARNING: code is not yet good for unecessary spaces
 void StompProtocol::SEND(vector<string> &input)
 {
     string fileName = input[1];
@@ -358,7 +351,7 @@ void StompProtocol::sendFrame(string frame)
 
 // input functions:
 
-//used when we receive a message from the server. pushes event to relevant eventList.
+//used when we receive a message from the server. Also pushes event to relevant eventList.
 void StompProtocol::MESSAGE(vector<string> &words)
 {
     string userName = words[4].substr(5);
@@ -440,11 +433,7 @@ void StompProtocol::RECEIPT(vector<string> &words)
     int receipt = stoi(receiptString);
     if (receipt == -1)
     {
-        while (commandsLeft != 0)
-        {
-            cout << "busy-waiting" << endl; // hopefully this never happens
-        }
-        // shouldTerminate = true;
+        while (commandsLeft != 0){}
     }
 }
 

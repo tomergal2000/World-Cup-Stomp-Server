@@ -47,11 +47,8 @@ public abstract class BaseServer<T> implements Server<T> {
 
                 Socket clientSock = serverSock.accept();
                 
-                synchronized(this){//do we need this?
+                synchronized(this){
                     
-                //try and catch ioEcxeption. when catching - return ERROR frame.
-                //check that clienSock.getInetAddress() is unique. if not - return ERROR frame.
-                //also make sure username is not already connected. happens in connect().
                 BlockingConnectionHandler<T> handler;
                 if(isStomp){
                     handler = new BlockingConnectionHandler<T>(
@@ -88,9 +85,5 @@ public abstract class BaseServer<T> implements Server<T> {
         return connections;
     }
 
-    protected abstract void execute(BlockingConnectionHandler<T>  handler);
-        //this will determine TPC (here we are supposed to create a new thread and run it)
-        //TODO: running while protocol !shouldTerminate()
-
-        
+    protected abstract void execute(BlockingConnectionHandler<T>  handler);        
 }

@@ -30,7 +30,6 @@ public class User {
         return connectionId != null;
     }
 
-    //TODO: handle ERROR?
     public boolean subscribe(Integer subId, String subName) {
         boolean keyISUsed = subIdToChan.containsKey(subId);
         boolean nameIsUsed = subIdToChan.containsValue(subName);
